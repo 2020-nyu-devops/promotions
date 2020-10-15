@@ -75,8 +75,12 @@ Vagrant.configure(2) do |config|
   SHELL
 
   ######################################################################
-  # Add MySQL docker container # TODO
+  # Add MySQL docker container
   ######################################################################
-  
+  config.vm.provision :docker do |d|
+    d.pull_images "mysql/mysql-server:latest"
+    d.run "mysql/mysql-server:latest",
+       args: "-d --name mysql -p 3306:3306 -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=DevOps_Promo"
+  end  
 
 end
