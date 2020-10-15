@@ -6,7 +6,7 @@ import os
 # Get configuration from environment
 # DATABASE_URI = os.getenv("DATABASE_URI", "sqlite:///../development.db")
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "mysql://root:DevOps_Promo@localhost:3306/promotion"
+    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
 )
 
 # Configure SQLAlchemy
