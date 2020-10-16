@@ -41,6 +41,14 @@ class PromoType(Enum):
     DISCOUNT = 2  # X% off
     FIXED = 3     # $X off
 
+promotion_products = db.Table('promotion_products',
+    db.Column('promotion_id', db.Integer, db.ForeignKey('promotion.id'), primary_key=True),
+    db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True)
+)
+
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
 class Promotion(db.Model):
     """
     Class that represents a Promotion
@@ -60,6 +68,9 @@ class Promotion(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     start_date = db.Column(db.DateTime(), nullable=False)
     end_date = db.Column(db.DateTime(), nullable=False)
+    # for promotion_products Many-to-Many relationship
+    products = db.relationship('Product', secondary=promotion_products, lazy='subquery',
+        backref=db.backref('promotions', lazy=True))
 
     def __repr__(self):
         return "<Promotion %r id=[%s]>" % (self.title, self.id)
