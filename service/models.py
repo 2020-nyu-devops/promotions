@@ -68,6 +68,7 @@ class Promotion(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     start_date = db.Column(db.DateTime(), nullable=False)
     end_date = db.Column(db.DateTime(), nullable=False)
+    is_site_wide = db.Column(db.Boolean(), nullable=False, default=False)
     # for promotion_products Many-to-Many relationship
     products = db.relationship('Product', secondary=promotion_products, lazy='subquery',
         backref=db.backref('promotions', lazy=True))
