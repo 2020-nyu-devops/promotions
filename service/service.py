@@ -19,6 +19,7 @@ from service.models import Promotion, DataValidationError
 # Import Flask application
 from . import app
 
+
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -33,6 +34,30 @@ def index():
         status.HTTP_200_OK,
     )
 
+
+######################################################################
+# ADD A NEW PROMOTION
+######################################################################
+@app.route("/promotions", methods=["POST"])
+def create_promotions():
+    """
+    Creates a Promotion
+    This endpoint will create a Promotion based the data in the body that is posted
+    """
+    app.logger.info("Request to create a promotion")
+    check_content_type("application/json")
+    promotion = Promotion()
+    promotion.deserialize(request.get_json())
+    promotion.create()
+    message = promotion.serialize()
+    # location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)
+
+    app.logger.info("Promotion with ID [%s] created.", promotion.id)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED  # , {"Location": location_url}
+    )
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -40,6 +65,7 @@ def init_db():
     """ Initialies the SQLAlchemy app """
     global app
     Promotion.init_db(app)
+
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """

@@ -14,6 +14,7 @@ Promotion - A Promotion used in the eCommerce website
 - amount: (int) the amount of the promotion base on promo_type
 - start_date: (date) the starting date
 - end_date: (date) the ending date
+- is_site_wide: (bool) whether the promotion is site wide (not associated with only certain product(s)
 -----------
 promotion_products - The relationship between promotion and product
 - id: (int) primary key, product_id + promotion_id
@@ -37,7 +38,7 @@ class DataValidationError(Exception):
 
 class PromoType(Enum):
     """ Enumeration of valid promotion types"""
-    BOGO = 1      # buy X get 1 free 
+    BOGO = 1      # buy X get 1 free
     DISCOUNT = 2  # X% off
     FIXED = 3     # $X off
 
@@ -76,6 +77,15 @@ class Promotion(db.Model):
     def __repr__(self):
         return "<Promotion %r id=[%s]>" % (self.title, self.id)
 
+    def create(self):
+        """
+        Creates a Promotion in the database
+        """
+        logger.info("Creating %s", self.title)
+        self.id = None  # id must be none to generate next primary key
+        db.session.add(self)
+        db.session.commit()
+
     def serialize(self):
         """ Serializes a Promotion into a dictionary """
         return {
@@ -83,10 +93,11 @@ class Promotion(db.Model):
             "title": self.title,
             "description": self.description,
             "promo_code": self.promo_code,
-            "promo_type": self.promo_type.name, # convert enum to string
+            "promo_type": self.promo_type.name,  # convert enum to string
             "amount": self.amount,
             "start_date": self.start_date,
             "end_date": self.end_date,
+            "is_site_wide": self.is_site_wide
         }
 
     def deserialize(self, data):
@@ -104,6 +115,7 @@ class Promotion(db.Model):
             self.amount = data["amount"]
             self.start_date = data["start_date"]
             self.end_date = data["end_date"]
+            self.is_site_wide = data["is_site_wide"]
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:
