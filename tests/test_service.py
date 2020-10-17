@@ -16,6 +16,10 @@ from service import app
 from service.service import init_db
 from .factories import PromotionFactory
 
+DATABASE_URI = os.getenv(
+    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
+)
+
 
 ######################################################################
 #  T E S T   C A S E S
@@ -25,23 +29,26 @@ class TestPromotionService(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """ This runs once before the entire test suite """
-        app.debug = False
-        app.testing = True
-        pass
+        """ Run once before all tests """
+        app.config['TESTING'] = True
+        app.config['DEBUG'] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        init_db()
 
     @classmethod
     def tearDownClass(cls):
-        """ This runs once after the entire test suite """
         pass
 
     def setUp(self):
-        """ This runs before each test """
+        """ Runs before each test """
+        db.drop_all()  # clean up the last tests
+        db.create_all()  # create new tables
         self.app = app.test_client()
 
     def tearDown(self):
-        """ This runs after each test """
-        pass
+        db.session.remove()
+        db.drop_all()
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -70,7 +77,6 @@ class TestPromotionService(TestCase):
         self.assertEqual(new_promotion["start_date"], test_promotion.start_date, "Start Date does not match")
         self.assertEqual(new_promotion["end_date"], test_promotion.end_date, "End Date does not match")
         self.assertEqual(new_promotion["is_site_wide"], test_promotion.is_site_wide, "Is Site Wide bool does not match")
-
 
     def _create_promotions(self, count):
         """ Factory method to create promotions in bulk """
