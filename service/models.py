@@ -9,12 +9,13 @@ Promotion - A Promotion used in the eCommerce website
 - id: (int) primary key
 - title: (str) the name of the promotion
 - description: (str) string/text
-- promo_code: (str) the promo_code associated with this promotion 
+- promo_code: (str) the promo_code associated with this promotion
 - promo_type: (str or enum) [BOGO | DISCOUNT | FIXED]
 - amount: (int) the amount of the promotion base on promo_type
 - start_date: (date) the starting date
 - end_date: (date) the ending date
-- is_site_wide: (bool) whether the promotion is site wide (not associated with only certain product(s)
+- is_site_wide: (bool) whether the promotion is site wide
+                (not associated with only certain product(s))
 -----------
 promotion_products - The relationship between promotion and product
 - id: (int) primary key, product_id + promotion_id
@@ -90,6 +91,18 @@ class Promotion(db.Model):
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
+
+    @classmethod
+    def find(cls, promotion_id):
+        """ Finds a Promotion by it's ID """
+        logger.info("Processing lookup for id %s ...", promotion_id)
+        return cls.query.get(promotion_id)
+
+    @classmethod
+    def find_or_404(cls, promotion_id):
+        """ Find a Promotion by it's id """
+        logger.info("Processing lookup or 404 for id %s ...", promotion_id)
+        return cls.query.get_or_404(promotion_id)
 
     def serialize(self):
         """ Serializes a Promotion into a dictionary """

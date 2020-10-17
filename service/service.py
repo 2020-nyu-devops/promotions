@@ -10,6 +10,7 @@ import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
+from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
@@ -36,6 +37,22 @@ def index():
 
 
 ######################################################################
+# RETRIEVE A PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["GET"])
+def get_promotions(promotion_id):
+    """
+    Retrieve a single Promotion
+    This endpoint will return a Promotion based on it's id
+    """
+    app.logger.info("Request for promotion with id: %s", promotion_id)
+    promotion = Promotion.find(promotion_id)
+    if not promotion:
+        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
 # ADD A NEW PROMOTION
 ######################################################################
 @app.route("/promotions", methods=["POST"])
@@ -50,11 +67,11 @@ def create_promotions():
     promotion.deserialize(request.get_json())
     promotion.create()
     message = promotion.serialize()
-    # location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)
+    location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)
 
     app.logger.info("Promotion with ID [%s] created.", promotion.id)
     return make_response(
-        jsonify(message), status.HTTP_201_CREATED  # , {"Location": location_url}
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
 
