@@ -93,7 +93,7 @@ class Promotion(db.Model):
             "title": self.title,
             "description": self.description,
             "promo_code": self.promo_code,
-            "promo_type": self.promo_type.name,  # convert enum to string
+            "promo_type": self.promo_type.name,
             "amount": self.amount,
             "start_date": self.start_date,
             "end_date": self.end_date,
