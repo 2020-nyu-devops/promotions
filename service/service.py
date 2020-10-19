@@ -74,6 +74,19 @@ def create_promotions():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# LIST ALL THE PROMOTIONS
+######################################################################
+@app.route("/promotions", methods=["GET"])
+def list_promotions():
+    """
+    List all promotions
+    """
+    app.logger.info("Request to list all promotions")
+    all_promotions = Promotion.all()
+    results = [promo.serialize() for promo in all_promotions]
+    app.logger.info("Returning %d promotions", len(results))
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
