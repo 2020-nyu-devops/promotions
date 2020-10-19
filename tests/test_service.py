@@ -135,6 +135,28 @@ class TestPromotionService(TestCase):
         self.assertEqual(data[0]['id'], test_promotion00.id)
         self.assertEqual(data[1]['id'], test_promotion01.id)
     
+    
+    def test_update_promotion(self):
+        """ Update an existing Promotion """
+        # create a promotion to update
+        test_promotion = PromotionFactory()
+        resp = self.app.post(
+            "/promotions", json=test_promotion.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # update the promotion
+        new_promotion = resp.get_json()
+        new_promotion["title"] = "unknown"
+        resp = self.app.put(
+            "/promotions/{}".format(new_promotion["id"]),
+            json=new_promotion,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_promotion = resp.get_json()
+        self.assertEqual(updated_promotion["title"], "unknown")
+
+
 ######################################################################
 #   M A I N
 ######################################################################
