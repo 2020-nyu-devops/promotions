@@ -14,6 +14,7 @@ Promotion - A Promotion used in the eCommerce website
 - amount: (int) the amount of the promotion base on promo_type
 - start_date: (date) the starting date
 - end_date: (date) the ending date
+- is_site_wide: (bool) whether the promotion is site wide (not associated with only certain product(s)
 -----------
 promotion_products - The relationship between promotion and product
 - id: (int) primary key, product_id + promotion_id
@@ -31,23 +32,28 @@ logger = logging.getLogger("flask.app")
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
 
+
 class PromoType(Enum):
     """ Enumeration of valid promotion types"""
-    BOGO = 1      # buy X get 1 free 
+    BOGO = 1  # buy X get 1 free
     DISCOUNT = 2  # X% off
-    FIXED = 3     # $X off
+    FIXED = 3  # $X off
+
 
 promotion_products = db.Table('promotion_products',
-    db.Column('promotion_id', db.Integer, db.ForeignKey('promotion.id'), primary_key=True),
-    db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True)
-)
+                              db.Column('promotion_id', db.Integer, db.ForeignKey('promotion.id'), primary_key=True),
+                              db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True)
+                              )
+
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+
 
 class Promotion(db.Model):
     """
@@ -71,10 +77,19 @@ class Promotion(db.Model):
     is_site_wide = db.Column(db.Boolean(), nullable=False, default=False)
     # for promotion_products Many-to-Many relationship
     products = db.relationship('Product', secondary=promotion_products, lazy='subquery',
-        backref=db.backref('promotions', lazy=True))
+                               backref=db.backref('promotions', lazy=True))
 
     def __repr__(self):
         return "<Promotion %r id=[%s]>" % (self.title, self.id)
+
+    def create(self):
+        """
+        Creates a Promotion in the database
+        """
+        logger.info("Creating %s", self.title)
+        self.id = None  # id must be none to generate next primary key
+        db.session.add(self)
+        db.session.commit()
 
     def serialize(self):
         """ Serializes a Promotion into a dictionary """
@@ -83,10 +98,11 @@ class Promotion(db.Model):
             "title": self.title,
             "description": self.description,
             "promo_code": self.promo_code,
-            "promo_type": self.promo_type.name, # convert enum to string
+            "promo_type": self.promo_type.name,
             "amount": self.amount,
             "start_date": self.start_date,
             "end_date": self.end_date,
+            "is_site_wide": self.is_site_wide
         }
 
     def deserialize(self, data):
@@ -100,10 +116,11 @@ class Promotion(db.Model):
             self.title = data["title"]
             self.description = data["description"]
             self.promo_code = data["promo_code"]
-            self.promo_type = getattr(PromoType, data['promo_type'])   # create enum from string
+            self.promo_type = getattr(PromoType, data['promo_type'])  # create enum from string
             self.amount = data["amount"]
             self.start_date = data["start_date"]
             self.end_date = data["end_date"]
+            self.is_site_wide = data["is_site_wide"]
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:
@@ -111,6 +128,12 @@ class Promotion(db.Model):
                 "Invalid promotion: body of request contained bad or no data"
             )
         return self
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the Promotions in the database """
+        logger.info("Processing all Promotions")
+        return cls.query.all()
 
     @classmethod
     def init_db(cls, app):
