@@ -80,8 +80,7 @@ def create_promotions():
 @app.route("/promotions/all", methods=["GET"])
 def list_promotions():
     """
-    List all currently running promotions
-    This endpoint will return a Promotion based on it's id
+    List all promotions in the database
     """
     app.logger.info("Request to list all current promotions")
     all_promotions = Promotion.all()
