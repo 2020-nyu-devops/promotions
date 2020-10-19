@@ -117,8 +117,24 @@ class TestPromotionService(TestCase):
         """ Get a Promotion thats not found """
         resp = self.app.get("/promotions/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-
+            
+    
+    def test_list_promotion(self):
+        """ List all promotions in the database """
+        
+        # create two promotions
+        test_promotion00 = self._create_promotions(1)[0]
+        test_promotion01 = self._create_promotions(1)[0]
+        
+        # if it gets 200 status, we pass
+        resp = self.app.get("/promotions/all")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        
+        # check that the ID of test promos match JSON returned
+        data = resp.get_json()
+        self.assertEqual(data[0]['id'], test_promotion00.id)
+        self.assertEqual(data[1]['id'], test_promotion01.id)
+    
 ######################################################################
 #   M A I N
 ######################################################################
