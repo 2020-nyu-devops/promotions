@@ -77,14 +77,16 @@ def create_promotions():
 ######################################################################
 # LIST ALL THE PROMOTIONS
 ######################################################################
-@app.route("/promotions/all", methods=["GET"])
+@app.route("/promotions", methods=["GET"])
 def list_promotions():
     """
-    List all promotions in the database
+    List all promotions
     """
-    app.logger.info("Request to list all current promotions")
+    app.logger.info("Request to list all promotions")
     all_promotions = Promotion.all()
-    return make_response(jsonify([promo.serialize() for promo in all_promotions]), status.HTTP_200_OK)    
+    results = [promo.serialize() for promo in all_promotions]
+    app.logger.info("Returning %d promotions", len(results))
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

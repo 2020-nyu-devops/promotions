@@ -127,7 +127,7 @@ class TestPromotionService(TestCase):
         test_promotion01 = self._create_promotions(1)[0]
         
         # if it gets 200 status, we pass
-        resp = self.app.get("/promotions/all")
+        resp = self.app.get("/promotions")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         
         # check that the ID of test promos match JSON returned
