@@ -74,6 +74,18 @@ def create_promotions():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# LIST ALL THE PROMOTIONS
+######################################################################
+@app.route("/promotions/all", methods=["GET"])
+def list_promotions():
+    """
+    List all currently running promotions
+    This endpoint will return a Promotion based on it's id
+    """
+    app.logger.info("Request to list all current promotions")
+    all_promotions = Promotion.all()
+    return make_response(jsonify([promo.serialize() for promo in all_promotions]), status.HTTP_200_OK)    
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
