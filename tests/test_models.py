@@ -10,6 +10,8 @@ import unittest
 import os
 from service.models import Promotion, DataValidationError, db, PromoType
 from service import app
+from .factories import PromotionFactory
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
@@ -44,7 +46,7 @@ class TestPromotion(unittest.TestCase):
         db.drop_all()
 
     ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E 
+    #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
 
     def test_create_a_promotion(self):
@@ -87,6 +89,25 @@ class TestPromotion(unittest.TestCase):
     def test_test(self):
         """ Test if the test environment works """
         self.assertTrue(True)
+
+    def test_find_promotion(self):
+        """ Find a Promotion by ID """
+        promotions = PromotionFactory.create_batch(3)
+        for promotion in promotions:
+            promotion.create()
+        logging.debug(promotions)
+        # find the 2nd promotion in the list
+        promotion = Promotion.find(promotions[1].id)
+        self.assertIsNot(promotion, None)
+        self.assertEqual(promotion.id, promotions[1].id)
+        self.assertEqual(promotion.title, promotions[1].title)
+        self.assertEqual(promotion.description, promotions[1].description)
+        self.assertEqual(promotion.promo_code, promotions[1].promo_code)
+        self.assertEqual(promotion.promo_type, promotions[1].promo_type)
+        self.assertEqual(promotion.amount, promotions[1].amount)
+        self.assertEqual(promotion.start_date, promotions[1].start_date)
+        self.assertEqual(promotion.end_date, promotions[1].end_date)
+        self.assertEqual(promotion.is_site_wide, promotions[1].is_site_wide)
 
 
 ######################################################################
