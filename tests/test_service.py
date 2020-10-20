@@ -156,6 +156,27 @@ class TestPromotionService(TestCase):
         updated_promotion = resp.get_json()
         self.assertEqual(updated_promotion["title"], "unknown")
 
+    def test_delete_promotion(self):
+        """ Delete a Promotion """
+        test_promotion = self._create_promotions(1)[0]
+        resp = self.app.delete(
+            "/promotions/{}".format(test_promotion.id), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            "/promotions/{}".format(test_promotion.id), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        
+    # If you call the DELETE function on a promotion that doesn't exist, should return OK
+    def test_delete_promotion_not_exist(self):
+        resp = self.app.delete(
+            "/promotions/{}".format("9999999999999999"), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
 
 ######################################################################
 #   M A I N
