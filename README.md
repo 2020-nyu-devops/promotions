@@ -85,6 +85,19 @@ You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this
 
 Try and get as close to 100% coverage as you can.
 
+## RESTful Endpoints
+| Request Type | Endpoint | Description |
+|-------| ------ |------------|
+|```GET``` |```/promotions``` | List all promotions or query based on certain parameters. |
+
+#### Query Parameters
+| Parameter |Description |
+|--------|-------------|
+|```amount``` | Filter the results based on the amount of discount |
+|```is_site_wide``` | Filter the results based on whether the promotion is available for the entire store |
+|```promo_code``` | Promo Code for a particular promotion |
+
+
 ## Acknowledgements
 
 The code structure, templating, and environment files are modified from this repository: https://github.com/nyu-devops/project-template.
