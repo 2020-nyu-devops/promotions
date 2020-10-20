@@ -119,6 +119,22 @@ class TestPromotion(unittest.TestCase):
             promotion.update()
         except:
             print("Update called with empty ID field")
+
+    def test_delete_a_promotion(self):
+        """ Delete a Promotion """
+        promotion = Promotion(
+            title = "test_create",
+            promo_type = PromoType.DISCOUNT,
+            amount = 10,
+            start_date = "Sat, 17 Oct 2020 00:00:00 GMT",
+            end_date = "Sun, 18 Oct 2020 00:00:00 GMT",
+            is_site_wide = True
+        )
+        promotion.create()
+        self.assertEqual(len(Promotion.all()), 1)
+        # delete the promotion and make sure it isn't in the database
+        promotion.delete()
+        self.assertEqual(len(Promotion.all()), 0)
        
     def test_test(self):
         """ Test if the test environment works """

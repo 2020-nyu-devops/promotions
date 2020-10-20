@@ -101,6 +101,12 @@ class Promotion(db.Model):
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
+    def delete(self):
+        """ Removes a Promotion from the database """
+        logger.info("Deleting %s", self.title)
+        db.session.delete(self)
+        db.session.commit()
+
     @classmethod
     def find(cls, promotion_id):
         """ Finds a Promotion by it's ID """

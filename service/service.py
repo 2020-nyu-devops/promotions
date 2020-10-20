@@ -108,6 +108,23 @@ def update_promotions(promotion_id):
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# DELETE A PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["DELETE"])
+def delete_promotions(promotion_id):
+    """
+    Delete a Promotions
+    This endpoint will delete a Promotion based the id specified in the path
+    """
+    app.logger.info("Request to delete promotion with id: %s", promotion_id)
+    promotion = Promotion.find(promotion_id)
+    if not promotion:
+        return make_response("", status.HTTP_200_OK)
+    promotion.delete()
+    app.logger.info("Promotion with ID [%s] delete complete.", promotion_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
