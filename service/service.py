@@ -74,6 +74,7 @@ def create_promotions():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+
 ######################################################################
 # LIST ALL THE PROMOTIONS
 ######################################################################
@@ -83,10 +84,24 @@ def list_promotions():
     List all promotions
     """
     app.logger.info("Request to list all promotions")
-    all_promotions = Promotion.all()
-    results = [promo.serialize() for promo in all_promotions]
+    site_wide = request.args.get("is_site_wide")
+    promo_type = request.args.get("promo_type")
+    promo_code = request.args.get("promo_code")
+    amount = request.args.get("amount")
+    filters = sum(
+        1 if i != None else 0 for i in (site_wide, promo_code, promo_type, amount)
+    )
+    app.logger.info(request.args)
+    if site_wide != None and filters == 1:
+        promotions = Promotion.find_by_site_wide(site_wide)
+    elif filters:
+        promotions = Promotion.find_by_query_string(request.args)
+    else:
+        promotions = Promotion.all()
+    results = [promo.serialize() for promo in promotions]
     app.logger.info("Returning %d promotions", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 ######################################################################
 # UPDATE AN EXISTING PROMOTION
@@ -107,6 +122,7 @@ def update_promotions(promotion_id):
     promotion.update()
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+
 
 ######################################################################
 # DELETE A PROMOTION

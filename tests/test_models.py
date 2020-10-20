@@ -159,6 +159,31 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.end_date, promotions[1].end_date)
         self.assertEqual(promotion.is_site_wide, promotions[1].is_site_wide)
 
+    def test_find_by_site_wide(self):
+        """ Find Promotions by site-wide """
+        promotions, is_site_wide_list = [], [True, False, True]
+        for site_wide in is_site_wide_list:
+            promotion = PromotionFactory()
+            promotion.is_site_wide = site_wide
+            promotion.create()
+            promotions.append(promotion)
+            logging.debug(promotion)
+        promotions_found = Promotion.find_by_site_wide(True)
+        for promotion, is_site_wide in zip(promotions, is_site_wide_list):
+            if is_site_wide:
+                self.assertIn(promotion, promotions_found)
+            else:
+                self.assertNotIn(promotion, promotions_found)
+        promotion = promotions_found[0]
+        self.assertIsNot(promotion, None)
+        self.assertEqual(promotion.id, promotions[0].id)
+        self.assertEqual(promotion.title, promotions[0].title)
+        self.assertEqual(promotion.description, promotions[0].description)
+        self.assertEqual(promotion.promo_code, promotions[0].promo_code)
+        self.assertEqual(promotion.promo_type, promotions[0].promo_type)
+        self.assertEqual(promotion.amount, promotions[0].amount)
+        self.assertEqual(promotion.start_date, promotions[0].start_date)
+        self.assertEqual(promotion.end_date, promotions[0].end_date)
 
 ######################################################################
 #   M A I N

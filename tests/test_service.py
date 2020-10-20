@@ -177,6 +177,77 @@ class TestPromotionService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_query_promotion_list_by_site_wide(self):
+        """ Query all promotions in the database by site-wide """
+        # Create a set of promotions
+        promotions, is_site_wide_list = [], [True, False, True]
+        for site_wide in is_site_wide_list:
+            test_promotion = PromotionFactory()
+            test_promotion.is_site_wide = site_wide
+            resp = self.app.post(
+                "/promotions", json=test_promotion.serialize(), content_type="application/json"
+            )
+            new_promotion = resp.get_json()
+            promotions.append(new_promotion)
+            logging.debug(new_promotion)
+        resp = self.app.get("/promotions", query_string=f"is_site_wide={True}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        for promotion, site_wide in zip(promotions, is_site_wide_list):
+            if site_wide:
+                self.assertIn(promotion, data)
+            else:
+                self.assertNotIn(promotion, data)
+
+    def test_query_promotion(self):
+        """ Query all promotions in the database by multiple parameters """
+        # Define the test cases
+        test_cases = [
+            {
+                "promo_code": "XYZ0000",
+                "amount": 50,
+                "is_site_wide": False
+            },
+            { 
+                "promo_code": "XYZ0001",
+                "amount": 10,
+                "is_site_wide": True
+            },
+            { 
+                "promo_code": "XYZ0002",
+                "amount": 20,
+                "is_site_wide": False
+            },
+            { 
+                "promo_code": "XYZ0003",
+                "amount": 20,
+                "is_site_wide": False
+            }
+        ]
+        tests = [
+            (f"is_site_wide={True}", 1),
+            (f"is_site_wide={False}", 3),
+            (f"promo_code=XYZ0004", 0),
+            (f"promo_code=XYZ0003", 1),
+            (f"promo_code=XYZ0003&is_site_wide={False}", 1),
+            (f"amount=20&is_site_wide={False}", 2),
+            (f"amount=20&is_site_wide={True}", 0)
+        ]
+        # Create the set of Promotions
+        for test_case in test_cases:
+            test_promotion = PromotionFactory()
+            for attribute in test_case:
+                setattr(test_promotion, attribute, test_case[attribute])
+            resp = self.app.post(
+                "/promotions", json=test_promotion.serialize(), content_type="application/json"
+            )
+        # Carry out the tests
+        for query_str, length_of_result in tests:
+            logging.debug(query_str)
+            resp = self.app.get("/promotions", query_string=query_str)
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            data = resp.get_json()
+            self.assertEqual(len(data), length_of_result)
 
 ######################################################################
 #   M A I N
