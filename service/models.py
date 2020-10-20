@@ -92,6 +92,15 @@ class Promotion(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def update(self):
+        """
+        Updates a Promotion to the database
+        """
+        logger.info("Updating %s", self.title)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
+        db.session.commit()
+
     @classmethod
     def find(cls, promotion_id):
         """ Finds a Promotion by it's ID """

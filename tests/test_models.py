@@ -86,6 +86,40 @@ class TestPromotion(unittest.TestCase):
         promotions = Promotion.all()
         self.assertEqual(len(promotions), 1)
 
+    def test_update_a_promotion(self):
+        """ Update a Promotion """
+        promotion = Promotion(
+            title = "test_create",
+            promo_type = PromoType.DISCOUNT,
+            amount = 10,
+            start_date = "Sat, 17 Oct 2020 00:00:00 GMT",
+            end_date = "Sun, 18 Oct 2020 00:00:00 GMT",
+            is_site_wide = True)
+        promotion.create()
+        self.assertEqual(promotion.id, 1)
+        # Change it and update it
+        promotion.title = "test_update"
+        promotion.update()
+        self.assertEqual(promotion.id, 1)
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        promotions = Promotion.all()
+        self.assertEqual(len(promotions), 1)
+        self.assertEqual(promotions[0].title, "test_update")
+        
+    def test_update_a_promotion_fail(self):
+        promotion = Promotion(
+            title = "test_create",
+            promo_type = PromoType.DISCOUNT,
+            amount = 10,
+            start_date = "Sat, 17 Oct 2020 00:00:00 GMT",
+            end_date = "Sun, 18 Oct 2020 00:00:00 GMT",
+            is_site_wide = True)
+        try:
+            promotion.update()
+        except:
+            print("Update called with empty ID field")
+       
     def test_test(self):
         """ Test if the test environment works """
         self.assertTrue(True)

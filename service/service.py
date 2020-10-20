@@ -89,6 +89,27 @@ def list_promotions():
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
+# UPDATE AN EXISTING PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["PUT"])
+def update_promotions(promotion_id):
+    """
+    Update a Promotion
+    This endpoint will update a Promotion based the body that is posted
+    """
+    app.logger.info("Request to update promotion with id: %s", promotion_id)
+    check_content_type("application/json")
+    promotion = Promotion.find(promotion_id)
+    if not promotion:
+        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+    promotion.deserialize(request.get_json())
+    promotion.id = promotion_id
+    promotion.update()
+    app.logger.info("Promotion with ID [%s] updated.", promotion.id)
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def init_db():
