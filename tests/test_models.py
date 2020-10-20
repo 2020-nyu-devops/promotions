@@ -185,6 +185,27 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.start_date, promotions[0].start_date)
         self.assertEqual(promotion.end_date, promotions[0].end_date)
 
+    def test_find_by_start_date(self):
+        """ Find Promotions by start date """
+        promotions, start_dates = [], [
+            "Sat, 17 Oct 2020 00:00:00 GMT", "Sun, 18 Oct 2020 00:00:00 GMT", 
+            "Wed, 21 Oct 2020 00:00:00 GMT", "Fri, 16 Oct 2020 00:00:00 GMT",
+            "Wed, 14 Oct 2020 00:00:00 GMT", "Fri, 23 Oct 2020 00:00:00 GMT"
+            ]
+        for start_date in start_dates:
+            promotion = PromotionFactory()
+            promotion.start_date = start_date
+            promotion.create()
+            promotions.append(promotion)
+            logging.debug(promotion)
+        promotions_found = Promotion.find_by_start_date("Sun, 18 Oct 2020 00:00:00 GMT")
+        for i, (promotion, start_date) in enumerate(zip(promotions, start_dates)):
+            if i in (1, 2, 5):
+                self.assertIn(promotion, promotions_found)
+            else:
+                self.assertNotIn(promotion, promotions_found)
+        
+
 ######################################################################
 #   M A I N
 ######################################################################

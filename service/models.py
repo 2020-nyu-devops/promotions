@@ -131,6 +131,12 @@ class Promotion(db.Model):
         logger.info(" Processing lookup based on query string %s ...", args)
         return cls.query.filter_by(**args).all()
 
+    @classmethod
+    def find_by_start_date(cls, start_date):
+        """ Find a Promotion by start date """
+        logger.info(" Processing lookup for start date %s ...", start_date)
+        return cls.query.filter(cls.start_date >= start_date)
+
     def serialize(self):
         """ Serializes a Promotion into a dictionary """
         return {
