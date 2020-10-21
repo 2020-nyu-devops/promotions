@@ -8,6 +8,7 @@ Test cases can be run with:
 import logging
 import unittest
 import os
+from werkzeug.exceptions import NotFound
 from service.models import Promotion, DataValidationError, db, PromoType
 from service import app
 from .factories import PromotionFactory
@@ -81,7 +82,7 @@ class TestPromotion(unittest.TestCase):
         self.assertTrue(promotion != None)
         self.assertEqual(promotion.id, None)
         promotion.create()
-        # Asert that it was assigned an id and shows up in the database
+        # Assert that it was assigned an id and shows up in the database
         self.assertEqual(promotion.id, 1)
         promotions = Promotion.all()
         self.assertEqual(len(promotions), 1)
@@ -89,12 +90,12 @@ class TestPromotion(unittest.TestCase):
     def test_update_a_promotion(self):
         """ Update a Promotion """
         promotion = Promotion(
-            title = "test_create",
-            promo_type = PromoType.DISCOUNT,
-            amount = 10,
-            start_date = "Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date = "Sun, 18 Oct 2020 00:00:00 GMT",
-            is_site_wide = True)
+            title="test_create",
+            promo_type=PromoType.DISCOUNT,
+            amount=10,
+            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
+            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            is_site_wide=True)
         promotion.create()
         self.assertEqual(promotion.id, 1)
         # Change it and update it
@@ -106,15 +107,15 @@ class TestPromotion(unittest.TestCase):
         promotions = Promotion.all()
         self.assertEqual(len(promotions), 1)
         self.assertEqual(promotions[0].title, "test_update")
-        
+
     def test_update_a_promotion_fail(self):
         promotion = Promotion(
-            title = "test_create",
-            promo_type = PromoType.DISCOUNT,
-            amount = 10,
-            start_date = "Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date = "Sun, 18 Oct 2020 00:00:00 GMT",
-            is_site_wide = True)
+            title="test_create",
+            promo_type=PromoType.DISCOUNT,
+            amount=10,
+            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
+            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            is_site_wide=True)
         try:
             promotion.update()
         except:
@@ -123,22 +124,34 @@ class TestPromotion(unittest.TestCase):
     def test_delete_a_promotion(self):
         """ Delete a Promotion """
         promotion = Promotion(
-            title = "test_create",
-            promo_type = PromoType.DISCOUNT,
-            amount = 10,
-            start_date = "Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date = "Sun, 18 Oct 2020 00:00:00 GMT",
-            is_site_wide = True
+            title="test_create",
+            promo_type=PromoType.DISCOUNT,
+            amount=10,
+            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
+            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            is_site_wide=True
         )
         promotion.create()
         self.assertEqual(len(Promotion.all()), 1)
         # delete the promotion and make sure it isn't in the database
         promotion.delete()
         self.assertEqual(len(Promotion.all()), 0)
-       
+
     def test_test(self):
         """ Test if the test environment works """
         self.assertTrue(True)
+
+    def test_deserialize_missing_data(self):
+        """ Test deserialization of a Promotion """
+        data = {"id": 1, "name": "kitty", "category": "cat"}
+        promotion = Promotion()
+        self.assertRaises(DataValidationError, promotion.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """ Test deserialization of bad data """
+        data = "this is not a dictionary"
+        promotion = Promotion()
+        self.assertRaises(DataValidationError, promotion.deserialize, data)
 
     def test_find_promotion(self):
         """ Find a Promotion by ID """
@@ -159,6 +172,9 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.end_date, promotions[1].end_date)
         self.assertEqual(promotion.is_site_wide, promotions[1].is_site_wide)
 
+    def test_find_or_404_not_found(self):
+        """ Find or return 404 NOT found """
+        self.assertRaises(NotFound, Promotion.find_or_404, 0)
 
 ######################################################################
 #   M A I N
