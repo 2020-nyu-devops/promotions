@@ -8,10 +8,10 @@ GET / - Returns a welcome message and 200 code
 import os
 import sys
 import logging
+from datetime import datetime
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-from datetime import datetime
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
@@ -163,7 +163,7 @@ def cancel_promotions(promotion_id):
     promotion = Promotion.find(promotion_id)
     if not promotion:
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
-    promotion.end_date = datetime.now() 
+    promotion.end_date = datetime.now()
     promotion.update()
     app.logger.info("Promotion with ID [%s] cancelled", promotion_id)
     return make_response("", status.HTTP_200_OK)

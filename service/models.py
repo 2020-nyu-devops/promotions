@@ -46,7 +46,7 @@ class PromoType(Enum):
     DISCOUNT = 2  # X% off
     FIXED = 3  # $X off
 
-
+# pylint: disable=line-too-long
 promotion_products = db.Table('promotion_products',
                               db.Column('promotion_id', db.Integer, db.ForeignKey('promotion.id'), primary_key=True),
                               db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True)
@@ -57,6 +57,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
 
+# pylint: disable=raise-missing-from
 class Promotion(db.Model):
     """
     Class that represents a Promotion

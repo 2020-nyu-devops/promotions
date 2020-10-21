@@ -13,9 +13,11 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object('config')
 
+# pylint: disable=wrong-import-position
 # Import the routes After the Flask app is created
 from service import service, models
 
+# pylint: disable=fixme
 # Set up logging for production #TODO
 
 app.logger.info(70 * "*")
