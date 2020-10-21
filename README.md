@@ -88,13 +88,13 @@ Try and get as close to 100% coverage as you can.
 
 ## Endpoints
 
-
 | Request Type | Endpoint | Description |
 |-------| ------ |------------|
-|```POST``` |```/promotions/cancel/<id>``` | Cancels a promotion based on its ID |
 |```GET``` |```/promotions``` | List all promotions or query based on certain parameters. |
+|```POST``` |```/promotions/cancel/<id>``` | Cancels a promotion based on its ID |
 
 #### Query Parameters
+
 | Parameter |Description |
 |--------|-------------|
 |```amount``` | Filter the results based on the amount of discount |
@@ -105,10 +105,22 @@ Try and get as close to 100% coverage as you can.
 |```end_date``` | Filter the results based on an end date. |
 |``` duration``` | Filter the results based on the duration (in days) of a promotion. For example, filter out all the ads with duration greater than 10 days. |
 
-###### Date Format ```Sat, 17 Oct 2020 00:00:00 GMT```
-###### Promo Types ```BOGO, DISCOUNT, FIXED```
+##### Date Format
+
+Dates for promotions look like: 
+
+```Sat, 17 Oct 2020 00:00:00 GMT```
 
 
+##### Promo Types 
+
+There are 3 different types of promotions we currently offer:
+
+```text
+BOGO # buy one product get one free
+DISCOUNT # fixed % off
+FIXED # set $ amount off
+```
 
 ## Acknowledgements
 
