@@ -118,7 +118,6 @@ class TestPromotionService(TestCase):
         resp = self.app.get("/promotions/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
             
-    
     def test_list_promotion(self):
         """ List all promotions in the database """
         
@@ -134,7 +133,6 @@ class TestPromotionService(TestCase):
         data = resp.get_json()
         self.assertEqual(data[0]['id'], test_promotion00.id)
         self.assertEqual(data[1]['id'], test_promotion01.id)
-    
     
     def test_update_promotion(self):
         """ Update an existing Promotion """
@@ -177,6 +175,21 @@ class TestPromotionService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_cancel_promotion(self):
+        """ Cancel a promotion """
+        
+        # try to cancel it before it's in there
+        resp = self.app.post('/promotions/cancel/{}'.format(1), content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        
+        # create a new promotion
+        test_promotion = self._create_promotions(1)[0]
+        
+        # cancel the promotion
+        resp = self.app.post('/promotions/cancel/{}'.format(test_promotion.id), content_type='application/json')
+                
+        # if it gets 200 status, we pass
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
 ######################################################################
 #   M A I N

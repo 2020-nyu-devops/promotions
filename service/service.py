@@ -11,6 +11,7 @@ import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
+from datetime import datetime
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
@@ -125,6 +126,23 @@ def delete_promotions(promotion_id):
     app.logger.info("Promotion with ID [%s] delete complete.", promotion_id)
     return make_response("", status.HTTP_204_NO_CONTENT)
 
+######################################################################
+# CANCEL A PROMOTION
+######################################################################
+@app.route("/promotions/cancel/<int:promotion_id>", methods=["POST"])
+def cancel_promotions(promotion_id):
+    """
+    Cancel a Promotions
+    This endpoint will cancel a Promotion based an ID
+    """
+    app.logger.info("Request to cancel promotion with id: %s", promotion_id)
+    promotion = Promotion.find(promotion_id)
+    if not promotion:
+        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+    promotion.end_date = datetime.now() 
+    promotion.update()
+    app.logger.info("Promotion with ID [%s] cancelled", promotion_id)
+    return make_response("", status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

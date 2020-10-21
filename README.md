@@ -85,6 +85,13 @@ You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this
 
 Try and get as close to 100% coverage as you can.
 
+## Endpoints
+
+
+| Request Type | Endpoint | Description |
+|-------| ------ |------------|
+|```POST``` |```/promotions/cancel/<id>``` | Cancels a promotion based on its ID |
+
 ## Acknowledgements
 
 The code structure, templating, and environment files are modified from this repository: https://github.com/nyu-devops/project-template.
