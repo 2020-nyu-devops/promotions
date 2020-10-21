@@ -102,6 +102,12 @@ class TestPromotionService(TestCase):
         self.assertEqual(new_promotion["is_site_wide"], test_promotion.is_site_wide,
                          "Is Site Wide bool does not match")
 
+    def test_invalid_content_type(self):
+        resp = self.app.post(
+            "/promotions", json="This is a string", content_type="text/html"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
     def test_get_promotion(self):
         """ Get a single Promotion """
         # get the id of a promotion

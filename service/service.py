@@ -21,6 +21,21 @@ from service.models import Promotion, DataValidationError
 # Import Flask application
 from . import app
 
+######################################################################
+# Error Handlers
+######################################################################
+@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+def mediatype_not_supported(error):
+    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+    app.logger.warning(str(error))
+    return (
+        jsonify(
+            status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            error="Unsupported media type",
+            message=str(error),
+        ),
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    )
 
 ######################################################################
 # GET INDEX
