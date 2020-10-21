@@ -160,6 +160,14 @@ class TestPromotionService(TestCase):
         updated_promotion = resp.get_json()
         self.assertEqual(updated_promotion["title"], "unknown")
 
+        # check that trying to update a non-existent promotion returns 404 not found
+        resp = self.app.put(
+            "/promotions/{}".format("999999999999999"),
+            json=new_promotion,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_promotion(self):
         """ Delete a Promotion """
         test_promotion = self._create_promotions(1)[0]
