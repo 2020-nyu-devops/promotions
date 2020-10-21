@@ -85,12 +85,42 @@ You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this
 
 Try and get as close to 100% coverage as you can.
 
-## Endpoints
 
+## Endpoints
 
 | Request Type | Endpoint | Description |
 |-------| ------ |------------|
+|```GET``` |```/promotions``` | List all promotions or query based on certain parameters. |
 |```POST``` |```/promotions/cancel/<id>``` | Cancels a promotion based on its ID |
+
+#### Query Parameters
+
+| Parameter |Description |
+|--------|-------------|
+|```amount``` | Filter the results based on the amount of discount |
+|```is_site_wide``` | Filter the results based on whether the promotion is available for the entire store |
+|```promo_code``` | Filter the results for a particular Promo Code |
+|```promo_type``` | Filter the results for a particular Promo Type |
+|```start_date``` | Filter the results based on a start date. |
+|```end_date``` | Filter the results based on an end date. |
+|``` duration``` | Filter the results based on the duration (in days) of a promotion. For example, filter out all the ads with duration greater than 10 days. |
+
+##### Date Format
+
+Dates for promotions look like: 
+
+```Sat, 17 Oct 2020 00:00:00 GMT```
+
+
+##### Promo Types 
+
+There are 3 different types of promotions we currently offer:
+
+```text
+BOGO # buy one product get one free
+DISCOUNT # fixed % off
+FIXED # set $ amount off
+```
 
 ## Acknowledgements
 
