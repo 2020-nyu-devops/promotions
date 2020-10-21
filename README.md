@@ -85,9 +85,13 @@ You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this
 
 Try and get as close to 100% coverage as you can.
 
-## RESTful Endpoints
+
+## Endpoints
+
+
 | Request Type | Endpoint | Description |
 |-------| ------ |------------|
+|```POST``` |```/promotions/cancel/<id>``` | Cancels a promotion based on its ID |
 |```GET``` |```/promotions``` | List all promotions or query based on certain parameters. |
 
 #### Query Parameters
@@ -103,6 +107,8 @@ Try and get as close to 100% coverage as you can.
 
 ###### Date Format ```Sat, 17 Oct 2020 00:00:00 GMT```
 ###### Promo Types ```BOGO, DISCOUNT, FIXED```
+
+
 
 ## Acknowledgements
 
