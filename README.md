@@ -92,6 +92,7 @@ Try and get as close to 100% coverage as you can.
 |-------| ------ |------------|
 |```GET``` |```/promotions``` | List all promotions or query based on certain parameters. |
 |```POST``` |```/promotions/cancel/<id>``` | Cancels a promotion based on its ID |
+|```GET``` |```/promotions/apply``` | Applies best promotion available to the list of products. Returns which promo-code to be applied. |
 
 #### Query Parameters
 

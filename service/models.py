@@ -27,7 +27,7 @@ promotion_products - The relationship between promotion and product
 import logging
 from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 logger = logging.getLogger("flask.app")
 
@@ -137,6 +137,23 @@ class Promotion(db.Model):
         if 'duration' in args:
             data = data.filter(cls.start_date + timedelta(days = int(args.get('duration'))) >= cls.end_date)
         return data.all()
+
+    @classmethod
+    def apply_best_promo(cls, product):
+        """ Find a Promotion by query string """
+        logger.info(" Finding best promotion for the product %s ...", product)
+        promos = cls.query.filter(cls.start_date <= datetime.now()).filter(cls.end_date >= datetime.now())
+        best_promo, best_discount = None, 0
+        for p in promos:
+            if p.promo_type == PromoType.DISCOUNT:
+                if p.amount > best_discount:
+                    best_promo, best_discount = p, p.amount
+            elif p.promo_type == PromoType.BOGO and best_discount < 50:
+                    best_promo, best_discount = p, 50
+        if best_promo:
+            return {product: best_promo.promo_code}
+        else:
+            return None
 
     def serialize(self):
         """ Serializes a Promotion into a dictionary """

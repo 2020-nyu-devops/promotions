@@ -11,7 +11,7 @@ import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from flask_api import status  # HTTP Status Codes
-from service.models import Promotion, DataValidationError, db, PromoType
+from service.models import Promotion, DataValidationError, db, PromoType, Product
 from service import app
 from service.service import init_db
 from .factories import PromotionFactory
@@ -300,6 +300,85 @@ class TestPromotionService(TestCase):
             "/promotions", json="{'test': 'promotion'}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_apply_best_promotions(self):
+        """ Test Apply Best Promotion """
+        product_1 = Product()
+        product_1.id = 123
+        product_2 = Product()
+        product_2.id = 456
+        # Define the promotions
+        promotions = [
+            {
+                "promo_code": "promo_code_1",
+                "promo_type": PromoType.DISCOUNT,
+                "amount": 40,
+                "is_site_wide": False,
+                "start_date": "Sat, 17 Oct 2020 00:00:00 GMT",
+                "end_date": "Wed, 21 Oct 2020 00:00:00 GMT",
+            }, 
+            { 
+                "promo_code": "promo_code_2",
+                "promo_type": PromoType.DISCOUNT,
+                "amount": 10,
+                "is_site_wide": True,
+                "start_date": "Wed, 21 Oct 2020 00:00:00 GMT",
+                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT",
+            },
+            { 
+                "promo_code": "promo_code_3",
+                "promo_type": PromoType.BOGO,
+                "amount": 1,
+                "is_site_wide": False,
+                "start_date": "Fri, 16 Oct 2020 00:00:00 GMT",
+                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT"
+            },
+            { 
+                "promo_code": "promo_code_4",
+                "promo_type": PromoType.DISCOUNT,
+                "amount": 80,
+                "is_site_wide": False,
+                "start_date": "Wed, 14 Oct 2020 00:00:00 GMT",
+                "end_date": "Sun, 18 Oct 2020 00:00:00 GMT"
+            }
+        ]
+        tests = [
+            (f"123=1000&456=5000", []),
+            (f"123=1000&456=5000", [{'123':'promo_code_3'}, {'456': 'promo_code_3'}]),
+            ('', [])
+        ]
+        # Carry out the tests without promotions in the system
+        for cart, result in tests[:1]:
+            logging.debug(cart)
+            resp = self.app.get("/promotions/apply", query_string=cart)
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            data = resp.get_json()
+            self.assertEqual(data, result)
+
+        logging.debug('Creating promotions')
+        # Create the set of Promotions
+        for promo in promotions:
+            test_promotion = PromotionFactory()
+            for attribute in promo:
+                setattr(test_promotion, attribute, promo[attribute])
+            if promo['promo_code'] == 'promo_code_1':
+                test_promotion.products.append(product_1)
+                test_promotion.products.append(product_2)
+            elif promo['promo_code'] == 'promo_code_3':
+                test_promotion.products.append(product_1)
+            elif promo['promo_code'] == 'promo_code_4':
+                test_promotion.products.append(product_2)
+            resp = self.app.post(
+                "/promotions", json=test_promotion.serialize(), content_type="application/json"
+            )
+        logging.debug('Promotions created')
+        # Carry out the tests
+        for cart, result in tests[1:]:
+            logging.debug(cart)
+            resp = self.app.get("/promotions/apply", query_string=cart)
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            data = resp.get_json()
+            self.assertEqual(data, result)
 
 ######################################################################
 #   M A I N

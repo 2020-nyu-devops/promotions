@@ -222,6 +222,27 @@ def cancel_promotions(promotion_id):
     return make_response("", status.HTTP_200_OK)
 
 ######################################################################
+# APPLY BEST PROMOTION
+######################################################################
+@app.route("/promotions/apply", methods=["GET"])
+def apply_best_promotions():
+    """
+    Apply best promotions
+    """
+    app.logger.info("Apply best promotions")
+    app.logger.info(request.args)
+    if len(request.args) > 0:
+        results = [
+            Promotion.apply_best_promo(product) \
+                for product in request.args
+        ]
+        results = list(filter(None, results))    
+    else:
+        results = []
+    app.logger.info("Returning %d results.", len(results))
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def init_db():
