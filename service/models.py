@@ -121,12 +121,6 @@ class Promotion(db.Model):
         return cls.query.get_or_404(promotion_id)
 
     @classmethod
-    def find_by_site_wide(cls, site_wide):
-        """ Find a Promotion by site wide """
-        logger.info(" Processing lookup for site_wide %s ...", site_wide)
-        return cls.query.filter(cls.is_site_wide == site_wide)
-
-    @classmethod
     def find_by_query_string(cls, args):
         """ Find a Promotion by query string """
         logger.info(" Processing lookup based on query string %s ...", args)
@@ -142,12 +136,6 @@ class Promotion(db.Model):
         if 'duration' in args:
             data = data.filter(cls.start_date + timedelta(days = int(args.get('duration'))) >= cls.end_date)
         return data.all()
-
-    @classmethod
-    def find_by_start_date(cls, start_date):
-        """ Find a Promotion by start date """
-        logger.info(" Processing lookup for start date %s ...", start_date)
-        return cls.query.filter(cls.start_date >= start_date)
 
     def serialize(self):
         """ Serializes a Promotion into a dictionary """
