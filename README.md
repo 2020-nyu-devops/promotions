@@ -95,8 +95,14 @@ Try and get as close to 100% coverage as you can.
 |--------|-------------|
 |```amount``` | Filter the results based on the amount of discount |
 |```is_site_wide``` | Filter the results based on whether the promotion is available for the entire store |
-|```promo_code``` | Promo Code for a particular promotion |
+|```promo_code``` | Filter the results for a particular Promo Code |
+|```promo_type``` | Filter the results for a particular Promo Type |
+|```start_date``` | Filter the results based on a start date. |
+|```end_date``` | Filter the results based on an end date. |
+|``` duration``` | Filter the results based on the duration (in days) of a promotion. For example, filter out all the ads with duration greater than 10 days. |
 
+###### Date Format ```Sat, 17 Oct 2020 00:00:00 GMT```
+###### Promo Types ```BOGO, DISCOUNT, FIXED```
 
 ## Acknowledgements
 
