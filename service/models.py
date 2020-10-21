@@ -27,6 +27,7 @@ promotion_products - The relationship between promotion and product
 import logging
 from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
+from datetime import timedelta
 
 logger = logging.getLogger("flask.app")
 
@@ -129,7 +130,18 @@ class Promotion(db.Model):
     def find_by_query_string(cls, args):
         """ Find a Promotion by query string """
         logger.info(" Processing lookup based on query string %s ...", args)
-        return cls.query.filter_by(**args).all()
+        filters = {}
+        for f in ['is_site_wide', 'promo_code', 'amount', 'promo_type']:
+            if f in args:
+                filters[f] = args.get(f)
+        data = cls.query.filter_by(**filters) if filters else cls.query
+        if 'start_date' in args:
+            data = data.filter(cls.start_date >= args.get('start_date'))
+        if 'end_date' in args:
+            data = data.filter(cls.end_date <= args.get('end_date'))
+        if 'duration' in args:
+            data = data.filter(cls.start_date + timedelta(days = int(args.get('duration'))) >= cls.end_date)
+        return data.all()
 
     @classmethod
     def find_by_start_date(cls, start_date):

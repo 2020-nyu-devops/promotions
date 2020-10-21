@@ -11,7 +11,7 @@ import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from flask_api import status  # HTTP Status Codes
-from service.models import Promotion, DataValidationError, db
+from service.models import Promotion, DataValidationError, db, PromoType
 from service import app
 from service.service import init_db
 from .factories import PromotionFactory
@@ -205,23 +205,35 @@ class TestPromotionService(TestCase):
         test_cases = [
             {
                 "promo_code": "XYZ0000",
+                "promo_type": PromoType.DISCOUNT,
                 "amount": 50,
-                "is_site_wide": False
+                "is_site_wide": False,
+                "start_date": "Sat, 17 Oct 2020 00:00:00 GMT",
+                "end_date": "Wed, 21 Oct 2020 00:00:00 GMT"
             },
             { 
                 "promo_code": "XYZ0001",
+                "promo_type": PromoType.DISCOUNT,
                 "amount": 10,
-                "is_site_wide": True
+                "is_site_wide": True,
+                "start_date": "Wed, 21 Oct 2020 00:00:00 GMT",
+                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT"
             },
             { 
                 "promo_code": "XYZ0002",
-                "amount": 20,
-                "is_site_wide": False
+                "promo_type": PromoType.BOGO,
+                "amount": 2,
+                "is_site_wide": False,
+                "start_date": "Fri, 16 Oct 2020 00:00:00 GMT",
+                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT"
             },
             { 
                 "promo_code": "XYZ0003",
+                "promo_type": PromoType.DISCOUNT,
                 "amount": 20,
-                "is_site_wide": False
+                "is_site_wide": False,
+                "start_date": "Wed, 14 Oct 2020 00:00:00 GMT",
+                "end_date": "Sun, 18 Oct 2020 00:00:00 GMT"
             }
         ]
         tests = [
@@ -230,8 +242,13 @@ class TestPromotionService(TestCase):
             (f"promo_code=XYZ0004", 0),
             (f"promo_code=XYZ0003", 1),
             (f"promo_code=XYZ0003&is_site_wide={False}", 1),
-            (f"amount=20&is_site_wide={False}", 2),
-            (f"amount=20&is_site_wide={True}", 0)
+            (f"amount=20&is_site_wide={False}", 1),
+            (f"amount=20&is_site_wide={True}", 0),
+            (f"promo_type=DISCOUNT&is_site_wide={True}", 1),
+            (f"promo_type=BOGO", 1),
+            (f"start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
+            (f"start_date=Tue, 13 Oct 2020 00:00:00 GMT&end_date=Wed, 21 Oct 2020 00:00:00 GMT", 2),
+            (f"duration=4", 3)
         ]
         # Create the set of Promotions
         for test_case in test_cases:

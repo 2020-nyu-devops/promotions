@@ -84,17 +84,10 @@ def list_promotions():
     List all promotions
     """
     app.logger.info("Request to list all promotions")
-    site_wide = request.args.get("is_site_wide")
-    promo_type = request.args.get("promo_type")
-    promo_code = request.args.get("promo_code")
-    amount = request.args.get("amount")
-    filters = sum(
-        1 if i != None else 0 for i in (site_wide, promo_code, promo_type, amount)
-    )
+    filters = ['is_site_wide', 'promo_code', 'promo_type', 'amount',
+                'start_date', 'end_date', 'duration']
     app.logger.info(request.args)
-    if site_wide != None and filters == 1:
-        promotions = Promotion.find_by_site_wide(site_wide)
-    elif filters:
+    if any(i in request.args for i in filters):
         promotions = Promotion.find_by_query_string(request.args)
     else:
         promotions = Promotion.all()
