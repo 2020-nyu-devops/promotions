@@ -331,7 +331,7 @@ class TestPromotionService(TestCase):
                 "amount": 1,
                 "is_site_wide": False,
                 "start_date": "Fri, 16 Oct 2020 00:00:00 GMT",
-                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT"
+                "end_date": "Wed, 30 Dec 2020 00:00:00 GMT"
             },
             { 
                 "promo_code": "promo_code_4",
