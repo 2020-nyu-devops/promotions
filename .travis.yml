@@ -1,0 +1,19 @@
+language: python
+python:
+  - "3.6"
+
+# Install Dependencies
+install: "pip install -r requirements.txt"
+
+# Run Tests
+before_script: 
+  - psql -c 'create database travis_ci_test;' -U postgres
+
+script:
+  - nosetests
+
+# after_success:
+#   - codecov
+
+services:
+  postgresql
