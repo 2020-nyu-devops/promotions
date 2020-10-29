@@ -1,5 +1,8 @@
 # Promotions
 
+[![Build Status](https://travis-ci.org/2020-nyu-devops/promotions.svg?branch=master)](https://travis-ci.org/2020-nyu-devops/promotions)
+[![codecov](https://codecov.io/gh/2020-nyu-devops/promotions/branch/master/graph/badge.svg?token=N3CA84MPTL)](undefined)
+
 This repository is part of the NYU class **CSCI-GA.2810-001: DevOps and Agile Methodologies** taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science. It contains the work done by the promotions squad for this class in fall of 2020.
 
 ## Overview
