@@ -12,6 +12,7 @@ from werkzeug.exceptions import NotFound
 from service.models import Promotion, DataValidationError, db, PromoType
 from service import app
 from .factories import PromotionFactory
+from datetime import datetime
 
 
 DATABASE_URI = os.getenv(
@@ -56,16 +57,16 @@ class TestPromotion(unittest.TestCase):
             title="test_create",
             promo_type=PromoType.DISCOUNT,
             amount=10,
-            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            start_date=datetime(2020, 10, 17),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True)
         self.assertTrue(promotion is not None)
         self.assertEqual(promotion.id, None)
         self.assertEqual(promotion.title, "test_create")
         self.assertEqual(promotion.promo_type, PromoType.DISCOUNT)
         self.assertEqual(promotion.amount, 10)
-        self.assertEqual(promotion.start_date, "Sat, 17 Oct 2020 00:00:00 GMT")
-        self.assertEqual(promotion.end_date, "Sun, 18 Oct 2020 00:00:00 GMT")
+        self.assertEqual(promotion.start_date, datetime(2020, 10, 17))
+        self.assertEqual(promotion.end_date, datetime(2020, 10, 18))
         self.assertEqual(promotion.is_site_wide, True)
 
     def test_add_a_promotion(self):
@@ -76,8 +77,8 @@ class TestPromotion(unittest.TestCase):
             title="test_create",
             promo_type=PromoType.DISCOUNT,
             amount=10,
-            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            start_date=datetime(2020, 10, 17),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True)
         self.assertTrue(promotion != None)
         self.assertEqual(promotion.id, None)
@@ -93,8 +94,8 @@ class TestPromotion(unittest.TestCase):
             title="test_create",
             promo_type=PromoType.DISCOUNT,
             amount=10,
-            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            start_date=datetime(2020, 10, 17),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True)
         promotion.create()
         self.assertEqual(promotion.id, 1)
@@ -113,8 +114,8 @@ class TestPromotion(unittest.TestCase):
             title="test_create",
             promo_type=PromoType.DISCOUNT,
             amount=10,
-            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            start_date=datetime(2020, 10, 17),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True)
         try:
             promotion.update()
@@ -127,8 +128,8 @@ class TestPromotion(unittest.TestCase):
             title="test_create",
             promo_type=PromoType.DISCOUNT,
             amount=10,
-            start_date="Sat, 17 Oct 2020 00:00:00 GMT",
-            end_date="Sun, 18 Oct 2020 00:00:00 GMT",
+            start_date=datetime(2020, 10, 17),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True
         )
         promotion.create()

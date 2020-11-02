@@ -15,6 +15,7 @@ from service.models import Promotion, DataValidationError, db, PromoType, Produc
 from service import app
 from service.service import init_db
 from .factories import PromotionFactory
+from datetime import datetime
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
@@ -95,9 +96,9 @@ class TestPromotionService(TestCase):
                          "Promo Types do not match")
         self.assertEqual(new_promotion["amount"], test_promotion.amount,
                          "Amounts do not match")
-        self.assertEqual(new_promotion["start_date"], test_promotion.start_date,
+        self.assertEqual(new_promotion["start_date"], test_promotion.start_date.isoformat(),
                          "Start Date does not match")
-        self.assertEqual(new_promotion["end_date"], test_promotion.end_date,
+        self.assertEqual(new_promotion["end_date"], test_promotion.end_date.isoformat(),
                          "End Date does not match")
         self.assertEqual(new_promotion["is_site_wide"], test_promotion.is_site_wide,
                          "Is Site Wide bool does not match")
@@ -214,47 +215,47 @@ class TestPromotionService(TestCase):
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 50,
                 "is_site_wide": False,
-                "start_date": "Sat, 17 Oct 2020 00:00:00 GMT",
-                "end_date": "Wed, 21 Oct 2020 00:00:00 GMT"
+                "start_date": datetime(2020, 10, 17),
+                "end_date": datetime(2020, 10, 21),
             },
             { 
                 "promo_code": "XYZ0001",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 10,
                 "is_site_wide": True,
-                "start_date": "Wed, 21 Oct 2020 00:00:00 GMT",
-                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT"
+                "start_date": datetime(2020, 10, 21),
+                "end_date": datetime(2020, 10, 23),
             },
             { 
                 "promo_code": "XYZ0002",
                 "promo_type": PromoType.BOGO,
                 "amount": 2,
                 "is_site_wide": False,
-                "start_date": "Fri, 16 Oct 2020 00:00:00 GMT",
-                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT"
+                "start_date": datetime(2020, 10, 16),
+                "end_date": datetime(2020, 10, 23),
             },
             { 
                 "promo_code": "XYZ0003",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 20,
                 "is_site_wide": False,
-                "start_date": "Wed, 14 Oct 2020 00:00:00 GMT",
-                "end_date": "Sun, 18 Oct 2020 00:00:00 GMT"
+                "start_date": datetime(2020, 10, 14),
+                "end_date": datetime(2020, 10, 18),
             }
         ]
         tests = [
-            (f"is_site_wide={True}", 1),
-            (f"is_site_wide={False}", 3),
-            (f"promo_code=XYZ0004", 0),
-            (f"promo_code=XYZ0003", 1),
-            (f"promo_code=XYZ0003&is_site_wide={False}", 1),
-            (f"amount=20&is_site_wide={False}", 1),
-            (f"amount=20&is_site_wide={True}", 0),
-            (f"promo_type=DISCOUNT&is_site_wide={True}", 1),
-            (f"promo_type=BOGO", 1),
-            (f"start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
-            (f"start_date=Tue, 13 Oct 2020 00:00:00 GMT&end_date=Wed, 21 Oct 2020 00:00:00 GMT", 2),
-            (f"duration=4", 3)
+            ("is_site_wide=true", 1),
+            ("is_site_wide=false", 3),
+            ("promo_code=XYZ0004", 0),
+            ("promo_code=XYZ0003", 1),
+            ("promo_code=XYZ0003&is_site_wide=false", 1),
+            ("amount=20&is_site_wide=false", 1),
+            ("amount=20&is_site_wide=true", 0),
+            ("promo_type=DISCOUNT&is_site_wide=true", 1),
+            ("promo_type=BOGO", 1),
+            ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
+            ("start_date=Tue, 13 Oct 2020 00:00:00 GMT&end_date=Wed, 21 Oct 2020 00:00:00 GMT", 2),
+            ("duration=4", 3)
         ]
         # Create the set of Promotions
         for test_case in test_cases:
@@ -270,6 +271,7 @@ class TestPromotionService(TestCase):
             resp = self.app.get("/promotions", query_string=query_str)
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
             data = resp.get_json()
+            print(query_str)
             self.assertEqual(len(data), length_of_result)
             
     def test_cancel_promotion(self):
@@ -314,32 +316,32 @@ class TestPromotionService(TestCase):
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 40,
                 "is_site_wide": False,
-                "start_date": "Sat, 17 Oct 2020 00:00:00 GMT",
-                "end_date": "Wed, 21 Oct 2020 00:00:00 GMT",
+                "start_date": datetime(2020, 10, 17),
+                "end_date": datetime(2020, 10, 21),
             }, 
             { 
                 "promo_code": "promo_code_2",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 10,
                 "is_site_wide": True,
-                "start_date": "Wed, 21 Oct 2020 00:00:00 GMT",
-                "end_date": "Fri, 23 Oct 2020 00:00:00 GMT",
+                "start_date": datetime(2020, 10, 21),
+                "end_date": datetime(2020, 10, 23),
             },
             { 
                 "promo_code": "promo_code_3",
                 "promo_type": PromoType.BOGO,
                 "amount": 1,
                 "is_site_wide": False,
-                "start_date": "Fri, 16 Oct 2020 00:00:00 GMT",
-                "end_date": "Wed, 30 Dec 2020 00:00:00 GMT"
+                "start_date": datetime(2020, 10, 16),
+                "end_date": datetime(2020, 12, 30),
             },
             { 
                 "promo_code": "promo_code_4",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 80,
                 "is_site_wide": False,
-                "start_date": "Wed, 14 Oct 2020 00:00:00 GMT",
-                "end_date": "Sun, 18 Oct 2020 00:00:00 GMT"
+                "start_date": datetime(2020, 10, 14),
+                "end_date": datetime(2020, 10, 18),
             }
         ]
         tests = [

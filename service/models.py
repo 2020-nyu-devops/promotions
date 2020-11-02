@@ -28,6 +28,7 @@ import logging
 from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta, datetime
+import dateutil.parser
 
 logger = logging.getLogger("flask.app")
 
@@ -131,9 +132,9 @@ class Promotion(db.Model):
                 filters[f] = args.get(f)
         data = cls.query.filter_by(**filters) if filters else cls.query
         if 'start_date' in args:
-            data = data.filter(cls.start_date >= args.get('start_date'))
+            data = data.filter(cls.start_date >= dateutil.parser.parse(args['start_date']))
         if 'end_date' in args:
-            data = data.filter(cls.end_date <= args.get('end_date'))
+            data = data.filter(cls.end_date <= dateutil.parser.parse(args['end_date']))
         if 'duration' in args:
             data = data.filter(cls.start_date + timedelta(days = int(args.get('duration'))) >= cls.end_date)
         return data.all()
@@ -164,8 +165,8 @@ class Promotion(db.Model):
             "promo_code": self.promo_code,
             "promo_type": self.promo_type.name,
             "amount": self.amount,
-            "start_date": self.start_date,
-            "end_date": self.end_date,
+            "start_date": self.start_date.isoformat(),
+            "end_date": self.end_date.isoformat(),
             "is_site_wide": self.is_site_wide
         }
 
