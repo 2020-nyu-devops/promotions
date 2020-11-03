@@ -167,7 +167,8 @@ class Promotion(db.Model):
             "amount": self.amount,
             "start_date": self.start_date.isoformat(),
             "end_date": self.end_date.isoformat(),
-            "is_site_wide": self.is_site_wide
+            "is_site_wide": self.is_site_wide,
+            "products": [product.id for product in self.products],
         }
 
     def deserialize(self, data):

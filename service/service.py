@@ -21,6 +21,7 @@ from service.models import Promotion, DataValidationError
 # Import Flask application
 from . import app
 
+
 ######################################################################
 # Error Handlers
 ######################################################################
@@ -29,9 +30,10 @@ def request_validation_error(error):
     """ Handles Value Errors from bad data """
     return bad_request(error)
 
+
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(error):
-    """ Handles bad reuests with 400_BAD_REQUEST """
+    """ Handles bad requests with 400_BAD_REQUEST """
     app.logger.warning(str(error))
     return (
         jsonify(
@@ -39,6 +41,7 @@ def bad_request(error):
         ),
         status.HTTP_400_BAD_REQUEST,
     )
+
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def not_found(error):
@@ -51,9 +54,10 @@ def not_found(error):
         status.HTTP_404_NOT_FOUND,
     )
 
+
 @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
 def method_not_supported(error):
-    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+    """ Handles unsupported HTTP methods with 405_METHOD_NOT_SUPPORTED """
     app.logger.warning(str(error))
     return (
         jsonify(
@@ -64,9 +68,10 @@ def method_not_supported(error):
         status.HTTP_405_METHOD_NOT_ALLOWED,
     )
 
+
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def mediatype_not_supported(error):
-    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+    """ Handles unsupported media requests with 415_UNSUPPORTED_MEDIA_TYPE """
     app.logger.warning(str(error))
     return (
         jsonify(
@@ -76,6 +81,7 @@ def mediatype_not_supported(error):
         ),
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
     )
+
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(error):
@@ -89,6 +95,7 @@ def internal_server_error(error):
         ),
         status.HTTP_500_INTERNAL_SERVER_ERROR,
     )
+
 
 ######################################################################
 # GET INDEX
@@ -154,7 +161,7 @@ def list_promotions():
     """
     app.logger.info("Request to list all promotions")
     filters = ['is_site_wide', 'promo_code', 'promo_type', 'amount',
-                'start_date', 'end_date', 'duration']
+               'start_date', 'end_date', 'duration']
     app.logger.info(request.args)
     if any(i in request.args for i in filters):
         promotions = Promotion.find_by_query_string(request.args)
@@ -203,6 +210,7 @@ def delete_promotions(promotion_id):
     app.logger.info("Promotion with ID [%s] delete complete.", promotion_id)
     return make_response("", status.HTTP_204_NO_CONTENT)
 
+
 ######################################################################
 # CANCEL A PROMOTION
 ######################################################################
@@ -221,6 +229,7 @@ def cancel_promotions(promotion_id):
     app.logger.info("Promotion with ID [%s] cancelled", promotion_id)
     return make_response("", status.HTTP_200_OK)
 
+
 ######################################################################
 # APPLY BEST PROMOTION
 ######################################################################
@@ -234,19 +243,20 @@ def apply_best_promotions():
     if len(request.args) > 0:
         results = [
             Promotion.apply_best_promo(product) \
-                for product in request.args
+            for product in request.args
         ]
-        results = list(filter(None, results))    
+        results = list(filter(None, results))
     else:
         results = []
     app.logger.info("Returning %d results.", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
 
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def init_db():
-    """ Initialies the SQLAlchemy app """
+    """ Initializes the SQLAlchemy app """
     global app
     Promotion.init_db(app)
 
