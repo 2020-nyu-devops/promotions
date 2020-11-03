@@ -206,7 +206,7 @@ def delete_promotions(promotion_id):
 ######################################################################
 # CANCEL A PROMOTION
 ######################################################################
-@app.route("/promotions/cancel/<int:promotion_id>", methods=["POST"])
+@app.route("/promotions/<int:promotion_id>/cancel", methods=["POST"])
 def cancel_promotions(promotion_id):
     """
     Cancel a Promotions
