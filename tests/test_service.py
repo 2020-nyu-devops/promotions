@@ -16,6 +16,8 @@ from service import app
 from service.service import init_db
 from .factories import PromotionFactory
 from datetime import datetime
+from freezegun import freeze_time
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
@@ -25,6 +27,7 @@ DATABASE_URI = os.getenv(
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+@freeze_time("2020-11-03")
 class TestPromotionService(TestCase):
     """ REST API Server Tests """
 
@@ -231,8 +234,8 @@ class TestPromotionService(TestCase):
                 "promo_type": PromoType.BOGO,
                 "amount": 2,
                 "is_site_wide": False,
-                "start_date": datetime(2020, 10, 16),
-                "end_date": datetime(2020, 10, 23),
+                "start_date": datetime(2020, 10, 14),
+                "end_date": datetime(2020, 10, 18),
             },
             { 
                 "promo_code": "XYZ0003",
@@ -240,7 +243,7 @@ class TestPromotionService(TestCase):
                 "amount": 20,
                 "is_site_wide": False,
                 "start_date": datetime(2020, 10, 14),
-                "end_date": datetime(2020, 10, 18),
+                "end_date": datetime(2021, 10, 18),
             }
         ]
         tests = [
@@ -254,8 +257,10 @@ class TestPromotionService(TestCase):
             ("promo_type=DISCOUNT&is_site_wide=true", 1),
             ("promo_type=BOGO", 1),
             ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
-            ("start_date=Tue, 13 Oct 2020 00:00:00 GMT&end_date=Wed, 21 Oct 2020 00:00:00 GMT", 2),
-            ("duration=4", 3)
+            ("start_date=Tue, 14 Oct 2020 00:00:00 GMT&end_date=Wed, 18 Oct 2020 00:00:00 GMT", 1),
+            ("duration=4", 3),
+            ("active=0", 3),
+            ("active=1", 1)
         ]
         # Create the set of Promotions
         for test_case in test_cases:

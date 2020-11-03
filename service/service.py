@@ -161,7 +161,7 @@ def list_promotions():
     """
     app.logger.info("Request to list all promotions")
     filters = ['is_site_wide', 'promo_code', 'promo_type', 'amount',
-               'start_date', 'end_date', 'duration']
+               'start_date', 'end_date', 'duration', 'active']
     app.logger.info(request.args)
     if any(i in request.args for i in filters):
         promotions = Promotion.find_by_query_string(request.args)

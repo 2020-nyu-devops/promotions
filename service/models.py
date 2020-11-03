@@ -136,7 +136,13 @@ class Promotion(db.Model):
         if 'end_date' in args:
             data = data.filter(cls.end_date <= dateutil.parser.parse(args['end_date']))
         if 'duration' in args:
-            data = data.filter(cls.start_date + timedelta(days = int(args.get('duration'))) >= cls.end_date)
+            # returns promotions that last at least the number of days specified
+            data = data.filter(cls.start_date + timedelta(days=int(args.get('duration'))) >= cls.end_date)
+        if 'active' in args:
+            if args.get('active') == '1':
+                data = data.filter(cls.start_date <= datetime.now()).filter(cls.end_date >= datetime.now())
+            else:
+                data = data.filter((cls.start_date > datetime.now()) | (datetime.now() > cls.end_date))
         return data.all()
 
     @classmethod
@@ -144,7 +150,7 @@ class Promotion(db.Model):
         """ Find a Promotion by query string """
         logger.info(" Finding best promotion for the product %s ...", product_id)
         promos = cls.query.filter(cls.start_date <= datetime.now()).filter(cls.end_date >= datetime.now())
-                
+
         product_promos = promos.filter(cls.products.any(id = product_id))
         site_wide_promos = promos.filter(cls.is_site_wide == True)
         logger.info("  Available site wide promos: " + str(site_wide_promos.all()))
@@ -161,7 +167,7 @@ class Promotion(db.Model):
                 fixed_discount = (((pricing - p.amount)/ pricing) * 100)
                 if fixed_discount > best_discount:
                     best_promo, best_discount = p, fixed_discount
-                    
+
         logger.info("  Promotion selected: " + str(best_promo.promo_code if best_promo else None))
         return {product_id: best_promo.promo_code} if best_promo else None
 
