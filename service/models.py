@@ -187,6 +187,13 @@ class Promotion(db.Model):
             self.start_date = data["start_date"]
             self.end_date = data["end_date"]
             self.is_site_wide = data["is_site_wide"]
+            self.products = []
+            for product_id in data["products"]:
+                product = Product.query.get(product_id)
+                if product is None:
+                    raise DataValidationError("Promotion has a product with an ID that does not exist")
+                else:
+                    self.products.append(product)
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:

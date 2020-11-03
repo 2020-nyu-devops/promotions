@@ -178,6 +178,45 @@ class TestPromotion(unittest.TestCase):
             },
         )
 
+    def test_deserialize(self):
+        """ Test deserialization of a promotion """
+        promotion = Promotion(
+            id=2,
+            title="Thanksgiving Special",
+            description="Some items off in honor of the most grateful month.",
+            promo_code="tgiving",
+            promo_type=PromoType.DISCOUNT,
+            amount=50,
+            start_date=datetime(2020, 11, 1),
+            end_date=datetime(2020, 11, 30),
+            is_site_wide=False,
+        )
+        product_1 = Product()
+        product_1.id = 123
+        promotion.products.append(product_1)
+        product_2 = Product()
+        product_2.id = 456
+        promotion.products.append(product_2)
+        db.session.add(product_1)
+        db.session.add(product_2)
+
+        data = promotion.serialize()
+        promotion.deserialize(data)
+
+        self.assertNotEqual(promotion, None)
+        self.assertEqual(promotion.id, 2)
+        self.assertEqual(promotion.title, "Thanksgiving Special")
+        self.assertEqual(promotion.description, "Some items off in honor of the most grateful month.")
+        self.assertEqual(promotion.promo_code, "tgiving")
+        self.assertEqual(promotion.amount, 50)
+        self.assertEqual(promotion.start_date, "2020-11-01T00:00:00")
+        self.assertEqual(promotion.end_date, "2020-11-30T00:00:00")
+        self.assertEqual(promotion.is_site_wide, False)
+        self.assertEqual(
+            [product.id for product in promotion.products],
+            [123, 456],
+        )
+
     def test_deserialize_missing_data(self):
         """ Test deserialization of a Promotion with missing data """
         data = {"id": 1, "name": "kitty", "category": "cat"}
