@@ -167,7 +167,8 @@ class Promotion(db.Model):
             "amount": self.amount,
             "start_date": self.start_date.isoformat(),
             "end_date": self.end_date.isoformat(),
-            "is_site_wide": self.is_site_wide
+            "is_site_wide": self.is_site_wide,
+            "products": [product.id for product in self.products],
         }
 
     def deserialize(self, data):
@@ -186,6 +187,13 @@ class Promotion(db.Model):
             self.start_date = data["start_date"]
             self.end_date = data["end_date"]
             self.is_site_wide = data["is_site_wide"]
+            self.products = []
+            for product_id in data["products"]:
+                product = Product.query.get(product_id)
+                if product is None:
+                    raise DataValidationError("Promotion has a product with an ID that does not exist")
+                else:
+                    self.products.append(product)
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:

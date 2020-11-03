@@ -345,8 +345,8 @@ class TestPromotionService(TestCase):
             }
         ]
         tests = [
-            (f"123=1000&456=5000", []),
-            (f"123=1000&456=5000", [{'123':'promo_code_3'}, {'456': 'promo_code_3'}]),
+            ("123=1000&456=5000", []),
+            ("123=1000&456=5000", [{'123':'promo_code_3'}, {'456': 'promo_code_3'}]),
             ('', [])
         ]
         # Carry out the tests without promotions in the system
@@ -366,8 +366,6 @@ class TestPromotionService(TestCase):
             if promo['promo_code'] == 'promo_code_1':
                 test_promotion.products.append(product_1)
                 test_promotion.products.append(product_2)
-            elif promo['promo_code'] == 'promo_code_3':
-                test_promotion.products.append(product_1)
             elif promo['promo_code'] == 'promo_code_4':
                 test_promotion.products.append(product_2)
             resp = self.app.post(
