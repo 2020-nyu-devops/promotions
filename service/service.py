@@ -242,7 +242,7 @@ def apply_best_promotions():
     app.logger.info(request.args)
     if len(request.args) > 0:
         results = [
-            Promotion.apply_best_promo(product) \
+            Promotion.apply_best_promo(product, int(request.args.get(product))) \
             for product in request.args
         ]
         results = list(filter(None, results))

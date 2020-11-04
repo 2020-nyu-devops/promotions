@@ -305,10 +305,36 @@ class TestPromotionService(TestCase):
 
     def test_apply_best_promotions(self):
         """ Test Apply Best Promotion """
+        # API: /promotions/apply?product_id=product_price
+
+        # Product - Promotion mapping
+        # Product 1
+        ## Available: Promo 1, Promo 2 (Store-wide), Promo 3, Promo 6 (Store-wide, Expired)
+        ## Best: Promo 3 (BOGO)
+        # Product 2
+        ## Available: Promo 1, Promo 2 (Store-wide), Promo_4, Promo 6 (Store-wide, Expired)
+        ## Best: Promo 4 (80%)
+        # Product 3
+        ## Available: Promo 2 (Store-wide), Promo 6 (Store-wide, Expired)
+        ## Best: Promo 2 (10%)
+        # Product 4
+        ## Available: Promo 2 (Store-wide), Promo 5, Promo 6 (Store-wide, Expired)
+        ## Best: Promo 5 (FIXED, 150)
+
         product_1 = Product()
-        product_1.id = 123
+        product_1.id = 100
         product_2 = Product()
-        product_2.id = 456
+        product_2.id = 200
+        product_3 = Product()
+        product_3.id = 300
+        product_4 = Product()
+        product_4.id = 400
+
+        db.session.add(product_1)
+        db.session.add(product_2)
+        db.session.add(product_3)
+        db.session.add(product_4)
+
         # Define the promotions
         promotions = [
             {
@@ -316,24 +342,24 @@ class TestPromotionService(TestCase):
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 40,
                 "is_site_wide": False,
-                "start_date": datetime(2020, 10, 17),
-                "end_date": datetime(2020, 10, 21),
+                "start_date": datetime(2020, 9, 2),
+                "end_date": datetime(2021, 10, 21),
             }, 
             { 
                 "promo_code": "promo_code_2",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 10,
                 "is_site_wide": True,
-                "start_date": datetime(2020, 10, 21),
-                "end_date": datetime(2020, 10, 23),
+                "start_date": datetime(2020, 8, 21),
+                "end_date": datetime(2021, 10, 23),
             },
             { 
                 "promo_code": "promo_code_3",
                 "promo_type": PromoType.BOGO,
                 "amount": 1,
                 "is_site_wide": False,
-                "start_date": datetime(2020, 10, 16),
-                "end_date": datetime(2020, 12, 30),
+                "start_date": datetime(2020, 9, 1),
+                "end_date": datetime(2021, 5, 30),
             },
             { 
                 "promo_code": "promo_code_4",
@@ -341,36 +367,58 @@ class TestPromotionService(TestCase):
                 "amount": 80,
                 "is_site_wide": False,
                 "start_date": datetime(2020, 10, 14),
-                "end_date": datetime(2020, 10, 18),
+                "end_date": datetime(2021, 5, 18),
+            },
+            { 
+                "promo_code": "promo_code_5",
+                "promo_type": PromoType.FIXED,
+                "amount": 150,
+                "is_site_wide": False,
+                "start_date": datetime(2020, 10, 14),
+                "end_date": datetime(2021, 10, 18),
+            },
+            { 
+                "promo_code": "promo_code_6",
+                "promo_type": PromoType.DISCOUNT,
+                "amount": 80,
+                "is_site_wide": True,
+                "start_date": datetime(2020, 9, 14),
+                "end_date": datetime(2020, 10, 15),
             }
         ]
         tests = [
-            ("123=1000&456=5000", []),
-            ("123=1000&456=5000", [{'123':'promo_code_3'}, {'456': 'promo_code_3'}]),
+            ("100=1000&200=5000", []),
+            ("100=1000&200=5000&300=268&400=255", 
+                [
+                    {'100':'promo_code_3'}, {'200': 'promo_code_4'}, 
+                    {'300': 'promo_code_2'}, {'400': 'promo_code_5'}
+                    ]),
             ('', [])
         ]
         # Carry out the tests without promotions in the system
         for cart, result in tests[:1]:
-            logging.debug(cart)
             resp = self.app.get("/promotions/apply", query_string=cart)
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
             data = resp.get_json()
             self.assertEqual(data, result)
 
-        logging.debug('Creating promotions')
         # Create the set of Promotions
+        logging.debug('Creating promotions')
         for promo in promotions:
-            test_promotion = PromotionFactory()
+            test_promotion = PromotionFactory()            
             for attribute in promo:
                 setattr(test_promotion, attribute, promo[attribute])
             if promo['promo_code'] == 'promo_code_1':
                 test_promotion.products.append(product_1)
                 test_promotion.products.append(product_2)
+            elif promo['promo_code'] == 'promo_code_3':
+                test_promotion.products.append(product_1)
             elif promo['promo_code'] == 'promo_code_4':
                 test_promotion.products.append(product_2)
-            resp = self.app.post(
-                "/promotions", json=test_promotion.serialize(), content_type="application/json"
-            )
+            elif promo['promo_code'] == 'promo_code_5':
+                test_promotion.products.append(product_4)
+            logging.debug(f" Promo: {promo['promo_code']} (Promo ID: {test_promotion.id}): Products - {test_promotion.products}")
+            self.app.post("/promotions", json=test_promotion.serialize(), content_type="application/json")
         logging.debug('Promotions created')
         # Carry out the tests
         for cart, result in tests[1:]:

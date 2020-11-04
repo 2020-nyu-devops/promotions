@@ -13,7 +13,7 @@ class PromotionFactory(factory.Factory):
     class Meta:
         model = Promotion
 
-    id = factory.Sequence(lambda n: n)
+    id = factory.Sequence(lambda n: n*100)
     title = "title"
     description = "description"
     promo_code = "promo_code"

@@ -140,21 +140,30 @@ class Promotion(db.Model):
         return data.all()
 
     @classmethod
-    def apply_best_promo(cls, product):
+    def apply_best_promo(cls, product_id, pricing):
         """ Find a Promotion by query string """
-        logger.info(" Finding best promotion for the product %s ...", product)
+        logger.info(" Finding best promotion for the product %s ...", product_id)
         promos = cls.query.filter(cls.start_date <= datetime.now()).filter(cls.end_date >= datetime.now())
+                
+        product_promos = promos.filter(cls.products.any(id = product_id))
+        site_wide_promos = promos.filter(cls.is_site_wide == True)
+        logger.info("  Available site wide promos: " + str(site_wide_promos.all()))
+        logger.info("  Available promos for this product: " + str(product_promos.all()))
+
         best_promo, best_discount = None, 0
-        for p in promos:
+        for p in site_wide_promos.all() + product_promos.all():
             if p.promo_type == PromoType.DISCOUNT:
                 if p.amount > best_discount:
                     best_promo, best_discount = p, p.amount
             elif p.promo_type == PromoType.BOGO and best_discount < 50:
                     best_promo, best_discount = p, 50
-        if best_promo:
-            return {product: best_promo.promo_code}
-        else:
-            return None
+            elif p.promo_type == PromoType.FIXED:
+                fixed_discount = (((pricing - p.amount)/ pricing) * 100)
+                if fixed_discount > best_discount:
+                    best_promo, best_discount = p, fixed_discount
+                    
+        logger.info("  Promotion selected: " + str(best_promo.promo_code if best_promo else None))
+        return {product_id: best_promo.promo_code} if best_promo else None
 
     def serialize(self):
         """ Serializes a Promotion into a dictionary """
