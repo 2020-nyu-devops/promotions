@@ -261,7 +261,9 @@ class TestPromotionService(TestCase):
         ]
         tests = [
             ("is_site_wide=true", 1),
+            ("is_site_wide=true&product=100", 0),
             ("is_site_wide=false", 3),
+            ("is_site_wide=false&product=200", 1),
             ("promo_code=XYZ0004", 0),
             ("promo_code=XYZ0003", 1),
             ("promo_code=XYZ0003&is_site_wide=false", 1),
