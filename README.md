@@ -89,6 +89,31 @@ You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this
 Try and get as close to 100% coverage as you can.
 
 
+## Deploy to IBM Cloud manually
+The `manifest.yml` file must be edited with the configuration of the cloud where is application is to be deployed to.
+
+Add the `apiKey.json` file to a new directory `.bluemix` in the folder. This should enable logging into your IBM Cloud to deploy the application.
+
+Invoke Vagrant and log into IBM Cloud using the following commands.
+
+``` shell
+    $ vagrant up
+    $ ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apiKey.json -r <region> -o <organization> -s <space> 
+``` 
+
+Ensure that the ElephantSQL URL is present in the `VCAP_SERVICES` environment variable of the runtime of the Cloud Foundry application.
+
+From the root directory of the application code execute the following to deploy the application to the IBM Cloud. 
+
+```bash
+$ ic cf push <YOUR_APP_NAME>
+```
+
+### View App
+Once the application is deployed and started, open a web browser and point to the application route defined at the end of the `cf push` command. This will execute the code under the `/` app route defined in the `server.py` file. Navigate to `/promotions` to see a list of promotions returned as JSON objects.
+
+
+
 ## Endpoints
 
 | Request Type | Endpoint | Description |
