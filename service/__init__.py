@@ -11,7 +11,7 @@ from flask import Flask
 
 # Create Flask application
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object("config")
 
 # pylint: disable=wrong-import-position
 # Import the routes After the Flask app is created

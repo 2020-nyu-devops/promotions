@@ -26,8 +26,8 @@ promotion_products - The relationship between promotion and product
 """
 import logging
 from enum import Enum
-from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta, datetime
+from flask_sqlalchemy import SQLAlchemy
 import dateutil.parser
 
 logger = logging.getLogger("flask.app")
@@ -38,8 +38,6 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
-    pass
-
 
 class PromoType(Enum):
     """ Enumeration of valid promotion types"""
@@ -80,8 +78,7 @@ class Promotion(db.Model):
     end_date = db.Column(db.DateTime(), nullable=False)
     is_site_wide = db.Column(db.Boolean(), nullable=False, default=False)
     # for promotion_products Many-to-Many relationship
-    products = db.relationship('Product', secondary=promotion_products, lazy='subquery',
-                               backref=db.backref('promotions', lazy=True))
+    products = db.relationship("Product", secondary=promotion_products, lazy="subquery")
 
     def __repr__(self):
         return "<Promotion %r id=[%s]>" % (self.title, self.id)
@@ -127,26 +124,45 @@ class Promotion(db.Model):
         """ Find a Promotion by query string """
         logger.info(" Processing lookup based on query string %s ...", args)
         filters = {}
-        for f in ['is_site_wide', 'promo_code', 'amount', 'promo_type']:
+        for f in ["is_site_wide", "promo_code", "amount", "promo_type"]:
             if f in args:
                 filters[f] = args.get(f)
         data = cls.query.filter_by(**filters) if filters else cls.query
-        if 'start_date' in args:
-            data = data.filter(cls.start_date >= dateutil.parser.parse(args['start_date']))
-        if 'end_date' in args:
-            data = data.filter(cls.end_date <= dateutil.parser.parse(args['end_date']))
-        if 'duration' in args:
-            data = data.filter(cls.start_date + timedelta(days = int(args.get('duration'))) >= cls.end_date)
+        if "start_date" in args:
+            data = data.filter(
+                cls.start_date >= dateutil.parser.parse(args["start_date"])
+            )
+        if "end_date" in args:
+            data = data.filter(cls.end_date <= dateutil.parser.parse(args["end_date"]))
+        if "duration" in args:
+            # returns promotions that last at least the number of days specified
+            data = data.filter(
+                cls.start_date + timedelta(days=int(args.get("duration")))
+                >= cls.end_date
+            )
+        if "active" in args:
+            if args.get("active") == "1":
+                data = data.filter(cls.start_date <= datetime.now()).filter(
+                    cls.end_date >= datetime.now()
+                )
+            if args.get("active") == "0":
+                data = data.filter(
+                    (cls.start_date > datetime.now()) | (datetime.now() > cls.end_date)
+                )
+        if "product" in args:
+            data = data.filter(cls.products.any(id=int(args.get("product"))))
         return data.all()
 
     @classmethod
     def apply_best_promo(cls, product_id, pricing):
         """ Find a Promotion by query string """
         logger.info(" Finding best promotion for the product %s ...", product_id)
-        promos = cls.query.filter(cls.start_date <= datetime.now()).filter(cls.end_date >= datetime.now())
-                
-        product_promos = promos.filter(cls.products.any(id = product_id))
-        site_wide_promos = promos.filter(cls.is_site_wide == True)
+        promos = cls.query.filter(cls.start_date <= datetime.now()).filter(
+            cls.end_date >= datetime.now()
+        )
+
+        product_promos = promos.filter(cls.products.any(id=product_id))
+        site_wide_promos = promos.filter(cls.is_site_wide)
         logger.info("  Available site wide promos: " + str(site_wide_promos.all()))
         logger.info("  Available promos for this product: " + str(product_promos.all()))
 
@@ -156,13 +172,16 @@ class Promotion(db.Model):
                 if p.amount > best_discount:
                     best_promo, best_discount = p, p.amount
             elif p.promo_type == PromoType.BOGO and best_discount < 50:
-                    best_promo, best_discount = p, 50
+                best_promo, best_discount = p, 50
             elif p.promo_type == PromoType.FIXED:
-                fixed_discount = (((pricing - p.amount)/ pricing) * 100)
+                fixed_discount = ((pricing - p.amount) / pricing) * 100
                 if fixed_discount > best_discount:
                     best_promo, best_discount = p, fixed_discount
-                    
-        logger.info("  Promotion selected: " + str(best_promo.promo_code if best_promo else None))
+
+        logger.info(
+            "  Promotion selected: "
+            + str(best_promo.promo_code if best_promo else None)
+        )
         return {product_id: best_promo.promo_code} if best_promo else None
 
     def serialize(self):
@@ -191,7 +210,9 @@ class Promotion(db.Model):
             self.title = data["title"]
             self.description = data["description"]
             self.promo_code = data["promo_code"]
-            self.promo_type = getattr(PromoType, data['promo_type'])  # create enum from string
+            self.promo_type = getattr(
+                PromoType, data["promo_type"]
+            )  # create enum from string
             self.amount = data["amount"]
             self.start_date = data["start_date"]
             self.end_date = data["end_date"]
@@ -200,7 +221,9 @@ class Promotion(db.Model):
             for product_id in data["products"]:
                 product = Product.query.get(product_id)
                 if product is None:
-                    raise DataValidationError("Promotion has a product with an ID that does not exist")
+                    raise DataValidationError(
+                        "Promotion has a product with an ID that does not exist"
+                    )
                 else:
                     self.products.append(product)
         except KeyError as error:

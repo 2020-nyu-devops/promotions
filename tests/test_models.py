@@ -8,12 +8,11 @@ Test cases can be run with:
 import logging
 import unittest
 import os
+from datetime import datetime
 from werkzeug.exceptions import NotFound
 from service.models import Promotion, Product, DataValidationError, db, PromoType
 from service import app
-from datetime import datetime
 from .factories import PromotionFactory
-from datetime import datetime
 
 
 DATABASE_URI = os.getenv(
@@ -29,8 +28,8 @@ class TestPromotion(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        app.config['TESTING'] = True
-        app.config['DEBUG'] = False
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         Promotion.init_db(app)
@@ -38,7 +37,6 @@ class TestPromotion(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """ This runs once after the entire test suite """
-        pass
 
     def setUp(self):
         db.drop_all()  # clean up the last tests
@@ -60,7 +58,8 @@ class TestPromotion(unittest.TestCase):
             amount=10,
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2020, 10, 18),
-            is_site_wide=True)
+            is_site_wide=True,
+        )
         self.assertTrue(promotion is not None)
         self.assertEqual(promotion.id, None)
         self.assertEqual(promotion.title, "test_create")
@@ -80,8 +79,9 @@ class TestPromotion(unittest.TestCase):
             amount=10,
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2020, 10, 18),
-            is_site_wide=True)
-        self.assertTrue(promotion != None)
+            is_site_wide=True,
+        )
+        self.assertTrue(promotion is not None)
         self.assertEqual(promotion.id, None)
         promotion.create()
         # Assert that it was assigned an id and shows up in the database
@@ -97,7 +97,8 @@ class TestPromotion(unittest.TestCase):
             amount=10,
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2020, 10, 18),
-            is_site_wide=True)
+            is_site_wide=True,
+        )
         promotion.create()
         self.assertEqual(promotion.id, 1)
         # Change it and update it
@@ -117,7 +118,8 @@ class TestPromotion(unittest.TestCase):
             amount=10,
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2020, 10, 18),
-            is_site_wide=True)
+            is_site_wide=True,
+        )
         try:
             promotion.update()
         except:
@@ -131,7 +133,7 @@ class TestPromotion(unittest.TestCase):
             amount=10,
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2020, 10, 18),
-            is_site_wide=True
+            is_site_wide=True,
         )
         promotion.create()
         self.assertEqual(len(Promotion.all()), 1)
@@ -142,7 +144,7 @@ class TestPromotion(unittest.TestCase):
     def test_test(self):
         """ Test if the test environment works """
         self.assertTrue(True)
-        
+
     def test_serialize(self):
         """ Test serialization of a Promotion """
         promotion = Promotion(
@@ -206,7 +208,9 @@ class TestPromotion(unittest.TestCase):
         self.assertNotEqual(promotion, None)
         self.assertEqual(promotion.id, 2)
         self.assertEqual(promotion.title, "Thanksgiving Special")
-        self.assertEqual(promotion.description, "Some items off in honor of the most grateful month.")
+        self.assertEqual(
+            promotion.description, "Some items off in honor of the most grateful month."
+        )
         self.assertEqual(promotion.promo_code, "tgiving")
         self.assertEqual(promotion.amount, 50)
         self.assertEqual(promotion.start_date, "2020-11-01T00:00:00")
@@ -251,6 +255,7 @@ class TestPromotion(unittest.TestCase):
     def test_find_or_404_not_found(self):
         """ Find or return 404 NOT found """
         self.assertRaises(NotFound, Promotion.find_or_404, 0)
+
 
 ######################################################################
 #   M A I N
