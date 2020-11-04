@@ -211,6 +211,11 @@ class TestPromotionService(TestCase):
 
     def test_query_promotion(self):
         """ Query all promotions in the database by multiple parameters """
+        product_1 = Product()
+        product_1.id = 100
+
+        db.session.add(product_1)
+
         # Define the test cases
         test_cases = [
             {
@@ -247,26 +252,30 @@ class TestPromotionService(TestCase):
             }
         ]
         tests = [
-            ("is_site_wide=true", 1),
-            ("is_site_wide=false", 3),
-            ("promo_code=XYZ0004", 0),
-            ("promo_code=XYZ0003", 1),
-            ("promo_code=XYZ0003&is_site_wide=false", 1),
-            ("amount=20&is_site_wide=false", 1),
-            ("amount=20&is_site_wide=true", 0),
-            ("promo_type=DISCOUNT&is_site_wide=true", 1),
-            ("promo_type=BOGO", 1),
-            ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
-            ("start_date=Tue, 14 Oct 2020 00:00:00 GMT&end_date=Wed, 18 Oct 2020 00:00:00 GMT", 1),
-            ("duration=4", 3),
-            ("active=0", 3),
-            ("active=1", 1)
+            # ("is_site_wide=true", 1),
+            # ("is_site_wide=false", 3),
+            # ("promo_code=XYZ0004", 0),
+            # ("promo_code=XYZ0003", 1),
+            # ("promo_code=XYZ0003&is_site_wide=false", 1),
+            # ("amount=20&is_site_wide=false", 1),
+            # ("amount=20&is_site_wide=true", 0),
+            # ("promo_type=DISCOUNT&is_site_wide=true", 1),
+            # ("promo_type=BOGO", 1),
+            # ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
+            # ("start_date=Tue, 14 Oct 2020 00:00:00 GMT&end_date=Wed, 18 Oct 2020 00:00:00 GMT", 1),
+            # ("duration=4", 3),
+            # ("active=0", 3),
+            # ("active=1", 1),
+            ("product=100", 3)
         ]
         # Create the set of Promotions
         for test_case in test_cases:
             test_promotion = PromotionFactory()
             for attribute in test_case:
                 setattr(test_promotion, attribute, test_case[attribute])
+            if test_case['is_site_wide'] == "false":
+                test_promotion.products.append(product_1)
+
             resp = self.app.post(
                 "/promotions", json=test_promotion.serialize(), content_type="application/json"
             )
