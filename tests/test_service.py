@@ -8,14 +8,13 @@ Test cases can be run with the following:
 import os
 import logging
 import unittest
+from datetime import datetime
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
 from flask_api import status  # HTTP Status Codes
 from service.models import Promotion, DataValidationError, db, PromoType, Product
 from service import app
 from service.service import init_db
 from .factories import PromotionFactory
-from datetime import datetime
 from freezegun import freeze_time
 
 
@@ -34,8 +33,8 @@ class TestPromotionService(TestCase):
     @classmethod
     def setUpClass(cls):
         """ Run once before all tests """
-        app.config['TESTING'] = True
-        app.config['DEBUG'] = False
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         init_db()
@@ -60,10 +59,14 @@ class TestPromotionService(TestCase):
         for _ in range(count):
             test_promotion = PromotionFactory()
             resp = self.app.post(
-                "/promotions", json=test_promotion.serialize(), content_type="application/json"
+                "/promotions",
+                json=test_promotion.serialize(),
+                content_type="application/json",
             )
             self.assertEqual(
-                resp.status_code, status.HTTP_201_CREATED, "Could not create test promotion"
+                resp.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test promotion",
             )
             new_promotion = resp.get_json()
             test_promotion.id = new_promotion["id"]
@@ -84,27 +87,49 @@ class TestPromotionService(TestCase):
         test_promotion = PromotionFactory()
         logging.debug(test_promotion)
         resp = self.app.post(
-            "/promotions", json=test_promotion.serialize(), content_type="application/json"
+            "/promotions",
+            json=test_promotion.serialize(),
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Check the data is correct
         new_promotion = resp.get_json()
-        self.assertEqual(new_promotion["title"], test_promotion.title,
-                         "Titles do not match")
-        self.assertEqual(new_promotion["description"], test_promotion.description,
-                         "Descriptions do not match")
-        self.assertEqual(new_promotion["promo_code"], test_promotion.promo_code,
-                         "Promo Codes do not match")
-        self.assertEqual(new_promotion["promo_type"], test_promotion.promo_type.name,
-                         "Promo Types do not match")
-        self.assertEqual(new_promotion["amount"], test_promotion.amount,
-                         "Amounts do not match")
-        self.assertEqual(new_promotion["start_date"], test_promotion.start_date.isoformat(),
-                         "Start Date does not match")
-        self.assertEqual(new_promotion["end_date"], test_promotion.end_date.isoformat(),
-                         "End Date does not match")
-        self.assertEqual(new_promotion["is_site_wide"], test_promotion.is_site_wide,
-                         "Is Site Wide bool does not match")
+        self.assertEqual(
+            new_promotion["title"], test_promotion.title, "Titles do not match"
+        )
+        self.assertEqual(
+            new_promotion["description"],
+            test_promotion.description,
+            "Descriptions do not match",
+        )
+        self.assertEqual(
+            new_promotion["promo_code"],
+            test_promotion.promo_code,
+            "Promo Codes do not match",
+        )
+        self.assertEqual(
+            new_promotion["promo_type"],
+            test_promotion.promo_type.name,
+            "Promo Types do not match",
+        )
+        self.assertEqual(
+            new_promotion["amount"], test_promotion.amount, "Amounts do not match"
+        )
+        self.assertEqual(
+            new_promotion["start_date"],
+            test_promotion.start_date.isoformat(),
+            "Start Date does not match",
+        )
+        self.assertEqual(
+            new_promotion["end_date"],
+            test_promotion.end_date.isoformat(),
+            "End Date does not match",
+        )
+        self.assertEqual(
+            new_promotion["is_site_wide"],
+            test_promotion.is_site_wide,
+            "Is Site Wide bool does not match",
+        )
 
     def test_get_promotion(self):
         """ Get a single Promotion """
@@ -135,15 +160,17 @@ class TestPromotionService(TestCase):
 
         # check that the ID of test promos match JSON returned
         data = resp.get_json()
-        self.assertEqual(data[0]['id'], test_promotion00.id)
-        self.assertEqual(data[1]['id'], test_promotion01.id)
+        self.assertEqual(data[0]["id"], test_promotion00.id)
+        self.assertEqual(data[1]["id"], test_promotion01.id)
 
     def test_update_promotion(self):
         """ Update an existing Promotion """
         # create a promotion to update
         test_promotion = PromotionFactory()
         resp = self.app.post(
-            "/promotions", json=test_promotion.serialize(), content_type="application/json"
+            "/promotions",
+            json=test_promotion.serialize(),
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # update the promotion
@@ -195,7 +222,9 @@ class TestPromotionService(TestCase):
             test_promotion = PromotionFactory()
             test_promotion.is_site_wide = site_wide
             resp = self.app.post(
-                "/promotions", json=test_promotion.serialize(), content_type="application/json"
+                "/promotions",
+                json=test_promotion.serialize(),
+                content_type="application/json",
             )
             new_promotion = resp.get_json()
             promotions.append(new_promotion)
@@ -257,7 +286,7 @@ class TestPromotionService(TestCase):
                 "is_site_wide": False,
                 "start_date": datetime(2020, 10, 14),
                 "end_date": datetime(2021, 10, 18),
-            }
+            },
         ]
         tests = [
             ("is_site_wide=true", 1),
@@ -278,21 +307,23 @@ class TestPromotionService(TestCase):
             ("active=1", 1),
             ("product=100", 3),
             ("product=200", 1),
-            ("", 4)
+            ("", 4),
         ]
         # Create the set of Promotions
         for test_case in test_cases:
             test_promotion = Promotion()
-            if not test_case['is_site_wide']:
+            if not test_case["is_site_wide"]:
                 test_promotion.products = [product_1]
-                if test_case['promo_code'] == 'XYZ0003':
+                if test_case["promo_code"] == "XYZ0003":
                     test_promotion.products.append(product_2)
 
             for attribute in test_case:
                 setattr(test_promotion, attribute, test_case[attribute])
 
             resp = self.app.post(
-                "/promotions", json=test_promotion.serialize(), content_type="application/json"
+                "/promotions",
+                json=test_promotion.serialize(),
+                content_type="application/json",
             )
         # Carry out the tests
         for query_str, length_of_result in tests:
@@ -307,14 +338,19 @@ class TestPromotionService(TestCase):
         """ Cancel a promotion """
 
         # try to cancel it before it's in there
-        resp = self.app.post('/promotions/{}/cancel'.format(1), content_type='application/json')
+        resp = self.app.post(
+            "/promotions/{}/cancel".format(1), content_type="application/json"
+        )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
         # create a new promotion
         test_promotion = self._create_promotions(1)[0]
 
         # cancel the promotion
-        resp = self.app.post('/promotions/{}/cancel'.format(test_promotion.id), content_type='application/json')
+        resp = self.app.post(
+            "/promotions/{}/cancel".format(test_promotion.id),
+            content_type="application/json",
+        )
 
         # if it gets 200 status, we pass
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -413,16 +449,20 @@ class TestPromotionService(TestCase):
                 "is_site_wide": True,
                 "start_date": datetime(2020, 9, 14),
                 "end_date": datetime(2020, 10, 15),
-            }
+            },
         ]
         tests = [
             ("100=1000&200=5000", []),
-            ("100=1000&200=5000&300=268&400=255",
+            (
+                "100=1000&200=5000&300=268&400=255",
                 [
-                    {'100':'promo_code_3'}, {'200': 'promo_code_4'},
-                    {'300': 'promo_code_2'}, {'400': 'promo_code_5'}
-                    ]),
-            ('', [])
+                    {"100": "promo_code_3"},
+                    {"200": "promo_code_4"},
+                    {"300": "promo_code_2"},
+                    {"400": "promo_code_5"},
+                ],
+            ),
+            ("", []),
         ]
         # Carry out the tests without promotions in the system
         for cart, result in tests[:1]:
@@ -432,23 +472,29 @@ class TestPromotionService(TestCase):
             self.assertEqual(data, result)
 
         # Create the set of Promotions
-        logging.debug('Creating promotions')
+        logging.debug("Creating promotions")
         for promo in promotions:
             test_promotion = PromotionFactory()
             for attribute in promo:
                 setattr(test_promotion, attribute, promo[attribute])
-            if promo['promo_code'] == 'promo_code_1':
+            if promo["promo_code"] == "promo_code_1":
                 test_promotion.products.append(product_1)
                 test_promotion.products.append(product_2)
-            elif promo['promo_code'] == 'promo_code_3':
+            elif promo["promo_code"] == "promo_code_3":
                 test_promotion.products.append(product_1)
-            elif promo['promo_code'] == 'promo_code_4':
+            elif promo["promo_code"] == "promo_code_4":
                 test_promotion.products.append(product_2)
-            elif promo['promo_code'] == 'promo_code_5':
+            elif promo["promo_code"] == "promo_code_5":
                 test_promotion.products.append(product_4)
-            logging.debug(f" Promo: {promo['promo_code']} (Promo ID: {test_promotion.id}): Products - {test_promotion.products}")
-            self.app.post("/promotions", json=test_promotion.serialize(), content_type="application/json")
-        logging.debug('Promotions created')
+            logging.debug(
+                f" Promo: {promo['promo_code']} (Promo ID: {test_promotion.id}): Products - {test_promotion.products}"
+            )
+            self.app.post(
+                "/promotions",
+                json=test_promotion.serialize(),
+                content_type="application/json",
+            )
+        logging.debug("Promotions created")
         # Carry out the tests
         for cart, result in tests[1:]:
             logging.debug(cart)
@@ -456,6 +502,7 @@ class TestPromotionService(TestCase):
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
             data = resp.get_json()
             self.assertEqual(data, result)
+
 
 ######################################################################
 #   M A I N

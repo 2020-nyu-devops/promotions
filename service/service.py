@@ -160,8 +160,17 @@ def list_promotions():
     List all promotions
     """
     app.logger.info("Request to list all promotions")
-    filters = ['is_site_wide', 'promo_code', 'promo_type', 'amount',
-               'start_date', 'end_date', 'duration', 'active', 'product']
+    filters = [
+        "is_site_wide",
+        "promo_code",
+        "promo_type",
+        "amount",
+        "start_date",
+        "end_date",
+        "duration",
+        "active",
+        "product",
+    ]
     app.logger.info(request.args)
     if any(i in request.args for i in filters):
         promotions = Promotion.find_by_query_string(request.args)
@@ -242,7 +251,7 @@ def apply_best_promotions():
     app.logger.info(request.args)
     if len(request.args) > 0:
         results = [
-            Promotion.apply_best_promo(product, int(request.args.get(product))) \
+            Promotion.apply_best_promo(product, int(request.args.get(product)))
             for product in request.args
         ]
         results = list(filter(None, results))
