@@ -80,8 +80,7 @@ class Promotion(db.Model):
     end_date = db.Column(db.DateTime(), nullable=False)
     is_site_wide = db.Column(db.Boolean(), nullable=False, default=False)
     # for promotion_products Many-to-Many relationship
-    products = db.relationship('Product', secondary=promotion_products, lazy='subquery',
-                               backref=db.backref('promotions', lazy=True))
+    products = db.relationship('Product', secondary=promotion_products, lazy='subquery')
 
     def __repr__(self):
         return "<Promotion %r id=[%s]>" % (self.title, self.id)
@@ -144,10 +143,7 @@ class Promotion(db.Model):
             if args.get('active') == '0':
                 data = data.filter((cls.start_date > datetime.now()) | (datetime.now() > cls.end_date))
         if 'product' in args:
-            # data = data.join(Product).filter(Product.id=int(args.get('product')))
             data = data.filter(cls.products.any(id=int(args.get('product'))))
-            # print("erergearsg: ", args.get('product'), data)
-        # print("data: ", data.all())
         return data.all()
 
     @classmethod

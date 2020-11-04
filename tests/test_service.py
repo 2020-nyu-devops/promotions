@@ -121,23 +121,23 @@ class TestPromotionService(TestCase):
         """ Get a Promotion thats not found """
         resp = self.app.get("/promotions/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-            
+
     def test_list_promotion(self):
         """ List all promotions in the database """
-        
+
         # create two promotions
         test_promotion00 = self._create_promotions(1)[0]
         test_promotion01 = self._create_promotions(1)[0]
-        
+
         # if it gets 200 status, we pass
         resp = self.app.get("/promotions")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        
+
         # check that the ID of test promos match JSON returned
         data = resp.get_json()
         self.assertEqual(data[0]['id'], test_promotion00.id)
         self.assertEqual(data[1]['id'], test_promotion01.id)
-    
+
     def test_update_promotion(self):
         """ Update an existing Promotion """
         # create a promotion to update
@@ -179,7 +179,7 @@ class TestPromotionService(TestCase):
             "/promotions/{}".format(test_promotion.id), content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     # If you call the DELETE function on a promotion that doesn't exist, should return OK
     def test_delete_promotion_not_exist(self):
         resp = self.app.delete(
@@ -214,12 +214,16 @@ class TestPromotionService(TestCase):
         product_1 = Product()
         product_1.id = 100
 
+        product_2 = Product()
+        product_2.id = 200
+
         db.session.add(product_1)
+        db.session.add(product_2)
 
         # Define the test cases
         test_cases = [
             {
-                "title":"0",
+                "title": "0",
                 "promo_code": "XYZ0000",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 50,
@@ -270,17 +274,20 @@ class TestPromotionService(TestCase):
             ("duration=4", 3),
             ("active=0", 3),
             ("active=1", 1),
-            ("product=100", 3)
+            ("product=100", 3),
+            ("product=200", 1),
+            ("", 4)
         ]
         # Create the set of Promotions
         for test_case in test_cases:
-            logging.debug("promotion factory call")
-            test_promotion = PromotionFactory()
+            test_promotion = Promotion()
+            if not test_case['is_site_wide']:
+                test_promotion.products = [product_1]
+                if test_case['promo_code'] == 'XYZ0003':
+                    test_promotion.products.append(product_2)
+
             for attribute in test_case:
                 setattr(test_promotion, attribute, test_case[attribute])
-            if test_case['is_site_wide'] == False:
-                logging.debug(test_case)
-                test_promotion.products.append(product_1)
 
             resp = self.app.post(
                 "/promotions", json=test_promotion.serialize(), content_type="application/json"
@@ -293,20 +300,20 @@ class TestPromotionService(TestCase):
             data = resp.get_json()
             print(query_str)
             self.assertEqual(len(data), length_of_result)
-            
+
     def test_cancel_promotion(self):
         """ Cancel a promotion """
-        
+
         # try to cancel it before it's in there
         resp = self.app.post('/promotions/{}/cancel'.format(1), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        
+
         # create a new promotion
         test_promotion = self._create_promotions(1)[0]
-        
+
         # cancel the promotion
         resp = self.app.post('/promotions/{}/cancel'.format(test_promotion.id), content_type='application/json')
-                
+
         # if it gets 200 status, we pass
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
@@ -364,8 +371,8 @@ class TestPromotionService(TestCase):
                 "is_site_wide": False,
                 "start_date": datetime(2020, 9, 2),
                 "end_date": datetime(2021, 10, 21),
-            }, 
-            { 
+            },
+            {
                 "promo_code": "promo_code_2",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 10,
@@ -373,7 +380,7 @@ class TestPromotionService(TestCase):
                 "start_date": datetime(2020, 8, 21),
                 "end_date": datetime(2021, 10, 23),
             },
-            { 
+            {
                 "promo_code": "promo_code_3",
                 "promo_type": PromoType.BOGO,
                 "amount": 1,
@@ -381,7 +388,7 @@ class TestPromotionService(TestCase):
                 "start_date": datetime(2020, 9, 1),
                 "end_date": datetime(2021, 5, 30),
             },
-            { 
+            {
                 "promo_code": "promo_code_4",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 80,
@@ -389,7 +396,7 @@ class TestPromotionService(TestCase):
                 "start_date": datetime(2020, 10, 14),
                 "end_date": datetime(2021, 5, 18),
             },
-            { 
+            {
                 "promo_code": "promo_code_5",
                 "promo_type": PromoType.FIXED,
                 "amount": 150,
@@ -397,7 +404,7 @@ class TestPromotionService(TestCase):
                 "start_date": datetime(2020, 10, 14),
                 "end_date": datetime(2021, 10, 18),
             },
-            { 
+            {
                 "promo_code": "promo_code_6",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 80,
@@ -408,9 +415,9 @@ class TestPromotionService(TestCase):
         ]
         tests = [
             ("100=1000&200=5000", []),
-            ("100=1000&200=5000&300=268&400=255", 
+            ("100=1000&200=5000&300=268&400=255",
                 [
-                    {'100':'promo_code_3'}, {'200': 'promo_code_4'}, 
+                    {'100':'promo_code_3'}, {'200': 'promo_code_4'},
                     {'300': 'promo_code_2'}, {'400': 'promo_code_5'}
                     ]),
             ('', [])
@@ -425,7 +432,7 @@ class TestPromotionService(TestCase):
         # Create the set of Promotions
         logging.debug('Creating promotions')
         for promo in promotions:
-            test_promotion = PromotionFactory()            
+            test_promotion = PromotionFactory()
             for attribute in promo:
                 setattr(test_promotion, attribute, promo[attribute])
             if promo['promo_code'] == 'promo_code_1':

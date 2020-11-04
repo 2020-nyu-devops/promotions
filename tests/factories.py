@@ -22,4 +22,3 @@ class PromotionFactory(factory.Factory):
     start_date = datetime(2020, 10, 17)
     end_date = datetime(2020, 10, 18)
     is_site_wide = True
-    products = []
