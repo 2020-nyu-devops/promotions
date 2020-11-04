@@ -144,7 +144,10 @@ class Promotion(db.Model):
             if args.get('active') == '0':
                 data = data.filter((cls.start_date > datetime.now()) | (datetime.now() > cls.end_date))
         if 'product' in args:
-            data = data.filter(cls.products.any(id=args.get('product')))
+            # data = data.join(Product).filter(Product.id=int(args.get('product')))
+            data = data.filter(cls.products.any(id=int(args.get('product'))))
+            # print("erergearsg: ", args.get('product'), data)
+        # print("data: ", data.all())
         return data.all()
 
     @classmethod

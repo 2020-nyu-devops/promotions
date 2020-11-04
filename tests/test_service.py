@@ -219,6 +219,7 @@ class TestPromotionService(TestCase):
         # Define the test cases
         test_cases = [
             {
+                "title":"0",
                 "promo_code": "XYZ0000",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 50,
@@ -226,7 +227,8 @@ class TestPromotionService(TestCase):
                 "start_date": datetime(2020, 10, 17),
                 "end_date": datetime(2020, 10, 21),
             },
-            { 
+            {
+                "title": "1",
                 "promo_code": "XYZ0001",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 10,
@@ -234,7 +236,8 @@ class TestPromotionService(TestCase):
                 "start_date": datetime(2020, 10, 21),
                 "end_date": datetime(2020, 10, 23),
             },
-            { 
+            {
+                "title": "2",
                 "promo_code": "XYZ0002",
                 "promo_type": PromoType.BOGO,
                 "amount": 2,
@@ -242,7 +245,8 @@ class TestPromotionService(TestCase):
                 "start_date": datetime(2020, 10, 14),
                 "end_date": datetime(2020, 10, 18),
             },
-            { 
+            {
+                "title": "3",
                 "promo_code": "XYZ0003",
                 "promo_type": PromoType.DISCOUNT,
                 "amount": 20,
@@ -252,28 +256,30 @@ class TestPromotionService(TestCase):
             }
         ]
         tests = [
-            # ("is_site_wide=true", 1),
-            # ("is_site_wide=false", 3),
-            # ("promo_code=XYZ0004", 0),
-            # ("promo_code=XYZ0003", 1),
-            # ("promo_code=XYZ0003&is_site_wide=false", 1),
-            # ("amount=20&is_site_wide=false", 1),
-            # ("amount=20&is_site_wide=true", 0),
-            # ("promo_type=DISCOUNT&is_site_wide=true", 1),
-            # ("promo_type=BOGO", 1),
-            # ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
-            # ("start_date=Tue, 14 Oct 2020 00:00:00 GMT&end_date=Wed, 18 Oct 2020 00:00:00 GMT", 1),
-            # ("duration=4", 3),
-            # ("active=0", 3),
-            # ("active=1", 1),
+            ("is_site_wide=true", 1),
+            ("is_site_wide=false", 3),
+            ("promo_code=XYZ0004", 0),
+            ("promo_code=XYZ0003", 1),
+            ("promo_code=XYZ0003&is_site_wide=false", 1),
+            ("amount=20&is_site_wide=false", 1),
+            ("amount=20&is_site_wide=true", 0),
+            ("promo_type=DISCOUNT&is_site_wide=true", 1),
+            ("promo_type=BOGO", 1),
+            ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
+            ("start_date=Tue, 14 Oct 2020 00:00:00 GMT&end_date=Wed, 18 Oct 2020 00:00:00 GMT", 1),
+            ("duration=4", 3),
+            ("active=0", 3),
+            ("active=1", 1),
             ("product=100", 3)
         ]
         # Create the set of Promotions
         for test_case in test_cases:
+            logging.debug("promotion factory call")
             test_promotion = PromotionFactory()
             for attribute in test_case:
                 setattr(test_promotion, attribute, test_case[attribute])
-            if test_case['is_site_wide'] == "false":
+            if test_case['is_site_wide'] == False:
+                logging.debug(test_case)
                 test_promotion.products.append(product_1)
 
             resp = self.app.post(
