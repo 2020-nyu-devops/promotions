@@ -1,17 +1,9 @@
----
-name: Issue template
-about: regular issue
-title: ''
-labels: ''
-assignees: ''
-
----
-
-### As a [some role]
-### I need [some function]
-### So that [i get some beneﬁt]
+**As a** 
+**I need** 
+**So that** 
 
 ### Assumptions
 - 
+
 ### Acceptance Criteria
--
+- 
