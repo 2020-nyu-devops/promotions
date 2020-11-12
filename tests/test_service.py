@@ -81,6 +81,7 @@ class TestPromotionService(TestCase):
         """ Test index call """
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn(b'NYU DevOps eCommerce Promotions', resp.data)
 
     def test_create_promotion(self):
         """ Create a new Promotion """
