@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Promotion RESTful Service</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <script type="text/javascript" src="static/js/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="static/js/rest_api.js"></script>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="pb-2 mt-4 mb-2 border-bottom">
+        <h1>NYU DevOps eCommerce Promotions REST API Service</h1>
+    </div>
+
+    <!-- Flash Message -->
+    <div class="alert alert-info" role="alert">
+        Status: <span id="flash_message"></span>
+    </div>
+
+    <div id="form_data">
+        <div class="form-group row">
+            <label for="promotion_id" class="col-sm-2 col-form-label">Promotion ID:</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="promotion_id" placeholder="Enter ID of a promotion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_title" class="col-sm-2 col-form-label">Promotion Title:</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="promotion_title" placeholder="Enter the title of a promotion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_description" class="col-sm-2 col-form-label">Promotion Description:</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="promotion_description" placeholder="Enter the description of a promotion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_promo_code" class="col-sm-2 col-form-label">Promo Code:</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="promotion_promo_code" placeholder="Enter the promo code associated with the promotion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_promo_type" class="col-sm-2 col-form-label">Promotion Type:</label>
+            <div class="col-sm-6">
+            <select class="form-control" id="promotion_promo_type">
+              <option value="BOGO">BOGO</option>
+              <option value="DISCOUNT">DISCOUNT</option>
+              <option value="FIXED">FIXED</option>
+            </select>
+            </div>
+          </div>
+
+        <div class="form-group row">
+            <label for="promotion_amount" class="col-sm-2 col-form-label">Promotion Discount Amount:</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="promotion_amount" placeholder="Enter the discount amount of a promotion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_duration" class="col-sm-2 col-form-label">Promotion Duration:</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="promotion_duration" placeholder="Enter the duration of a promotion in days (e.g. 10)">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_start_date" class="col-sm-2 col-form-label">Promotion Start Date:</label>
+            <div class="col-sm-6">
+                <input type="date" class="form-control" id="promotion_start_date" placeholder="Enter the start date of a promotion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_end_date" class="col-sm-2 col-form-label">Promotion End Date:</label>
+            <div class="col-sm-6">
+                <input type="date" class="form-control" id="promotion_end_date" placeholder="Enter the end date of a promotion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_is_site_wide" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="promotion_is_site_wide">
+                    <label class="form-check-label" for="promotion_is_site_wide">Is site wide</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="promotion_active" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="promotion_active">
+                    <label class="form-check-label" for="promotion_active">Is currently active</label>
+                </div>
+            </div>
+        </div>
+
+        <br/>
+
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-outline-secondary" id="clear-btn">Clear</button>
+                <button type="submit" class="btn btn-outline-warning" id="cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-outline-success" id="create-btn">Create</button>
+                <button type="submit" class="btn btn-outline-danger" id="delete-btn">Delete</button>
+                <button type="submit" class="btn btn-outline-info" id="retrieve-btn">Retrieve</button>
+                <button type="submit" class="btn btn-outline-info" id="search-btn">Search</button>
+                <button type="submit" class="btn btn-outline-primary" id="update-btn">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <h3>Search Results</h3>
+    <div class="table-responsive" id="search_results">
+        <table class="table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Promo Code</th>
+                <th>Promo Type</th>
+                <th>Amount</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Site-wide Status</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+
+    <footer>
+        <br><br>
+        <p>Licensed MIT | NYU DevOps 2020 Promotion Team</p>
+    </footer>
+
+</div><!-- container -->
+</body>
+</html>
