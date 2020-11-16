@@ -89,6 +89,35 @@ class TestPromotion(unittest.TestCase):
         promotions = Promotion.all()
         self.assertEqual(len(promotions), 1)
 
+    def test_create_a_product_and_associated_promotion(self):
+        """ Create a product and add it to the database, then create a promotion associated with the product """
+        promotions = Promotion.all()
+        products = Product.all()
+        self.assertEqual(promotions, [])
+        self.assertEqual(products, [])
+
+        promotion = Promotion(
+            title="test_create",
+            promo_type=PromoType.DISCOUNT,
+            amount=10,
+            start_date=datetime(2020, 10, 17),
+            end_date=datetime(2020, 10, 18),
+            is_site_wide=True,
+        )
+        product = Product(
+            id=123
+        )
+        promotion.products.append(product)
+        self.assertTrue(product is not None)
+        product.create()
+        promotion.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(promotion.id, 1)
+        self.assertEqual(product.id, 123)
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+
+
     def test_update_a_promotion(self):
         """ Update a Promotion """
         promotion = Promotion(

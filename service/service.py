@@ -16,7 +16,7 @@ from werkzeug.exceptions import NotFound
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import Promotion, DataValidationError
+from service.models import Promotion, DataValidationError, Product
 
 # Import Flask application
 from . import app
@@ -139,6 +139,28 @@ def create_promotions():
     location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)
 
     app.logger.info("Promotion with ID [%s] created.", promotion.id)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+
+######################################################################
+# ADD A NEW PRODUCT
+######################################################################
+@app.route("/products", methods=["POST"])
+def create_product():
+    """
+    Creates a Product
+    This endpoint will create a Product based the id in the body that is posted
+    """
+    app.logger.info("Request to create a product")
+    check_content_type("application/json")
+    product = Product()
+    product.deserialize(request.get_json())
+    product.create()
+    message = product.serialize()
+    location_url = url_for("get_promotions", promotion_id=product.id, _external=True)
+
+    app.logger.info("Product with ID [%s] created.", product.id)
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )

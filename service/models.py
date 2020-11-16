@@ -56,8 +56,47 @@ promotion_products = db.Table('promotion_products',
 
 
 class Product(db.Model):
+    """
+    Class that represents a Product, which just has an ID and no further information.
+
+    This version uses a relational database for persistence which is hidden
+    from us by SQLAlchemy's object relational mappings (ORM)
+    """
+
     id = db.Column(db.Integer, primary_key=True)
 
+    def create(self):
+        """
+        Creates a Product in the database
+        """
+        logger.info("Creating Product with id: %s", self.id)
+        db.session.add(self)
+        db.session.commit()
+
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the Products in the database """
+        logger.info("Processing all Products")
+        return cls.query.all()
+
+    def serialize(self):
+        """ Serializes a Product into a dictionary """
+        return {"id": self.id}
+
+    def deserialize(self, data):
+        """
+        Deserializes a Product from a dictionary
+        """
+        try:
+            self.id = data["id"]
+        except KeyError as error:
+            raise DataValidationError("Invalid promotion: missing id field")
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid product: body of request contained bad or no data"
+            )
+        return self
 
 # pylint: disable=raise-missing-from
 class Promotion(db.Model):

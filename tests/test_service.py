@@ -14,7 +14,7 @@ from flask_api import status  # HTTP Status Codes
 from service.models import Promotion, DataValidationError, db, PromoType, Product
 from service import app
 from service.service import init_db
-from .factories import PromotionFactory
+from .factories import PromotionFactory, ProductFactory
 from freezegun import freeze_time
 
 
@@ -130,6 +130,22 @@ class TestPromotionService(TestCase):
             new_promotion["is_site_wide"],
             test_promotion.is_site_wide,
             "Is Site Wide bool does not match",
+        )
+
+    def test_create_product(self):
+        """ Create a new Product """
+        test_product = ProductFactory()
+        logging.debug(test_product)
+        resp = self.app.post(
+            "/products",
+            json=test_product.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # Check the data is correct
+        new_product = resp.get_json()
+        self.assertEqual(
+            new_product["id"], test_product.id, "IDs do not match"
         )
 
     def test_get_promotion(self):
