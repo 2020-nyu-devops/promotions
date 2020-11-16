@@ -58,7 +58,7 @@ def not_found(error):
 @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
 def method_not_supported(error):
     """ Handles unsupported HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    app.logger.warning(str(error))
+    app.logger.warning(str(error))  # untested
     return (
         jsonify(
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
@@ -86,7 +86,7 @@ def mediatype_not_supported(error):
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(error):
     """ Handles unexpected server error with 500_SERVER_ERROR """
-    app.logger.error(str(error))
+    app.logger.error(str(error))  # untested
     return (
         jsonify(
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -132,8 +132,12 @@ def create_promotions():
     """
     app.logger.info("Request to create a promotion")
     check_content_type("application/json")
+    json = request.get_json()
+    for product_id in json["products"]:
+        if Product.query.get(product_id) is None:
+            Product(id=product_id).create()
     promotion = Promotion()
-    promotion.deserialize(request.get_json())
+    promotion.deserialize(json)
     promotion.create()
     message = promotion.serialize()
     location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)

@@ -69,6 +69,17 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.end_date, datetime(2020, 10, 18))
         self.assertEqual(promotion.is_site_wide, True)
 
+    def test_create_a_product(self):
+        products = Product.all()
+        self.assertEqual(products, [])
+        product = Product(id=123)
+        self.assertTrue(product is not None)
+        product.create()
+        self.assertEqual(product.id, 123)
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+
+
     def test_add_a_promotion(self):
         """ Create a promotion and add it to the database """
         promotions = Promotion.all()
@@ -89,8 +100,8 @@ class TestPromotion(unittest.TestCase):
         promotions = Promotion.all()
         self.assertEqual(len(promotions), 1)
 
-    def test_create_a_product_and_associated_promotion(self):
-        """ Create a product and add it to the database, then create a promotion associated with the product """
+    def test_create_a_promotion_associated_with_new_product(self):
+        """ Create a promotion which is associated with a product thats not in our db yet"""
         promotions = Promotion.all()
         products = Product.all()
         self.assertEqual(promotions, [])
@@ -109,13 +120,14 @@ class TestPromotion(unittest.TestCase):
         )
         promotion.products.append(product)
         self.assertTrue(product is not None)
-        product.create()
         promotion.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(promotion.id, 1)
         self.assertEqual(product.id, 123)
         products = Product.all()
+        promotions = Promotion.all()
         self.assertEqual(len(products), 1)
+        self.assertEqual(len(promotions), 1)
 
 
     def test_update_a_promotion(self):

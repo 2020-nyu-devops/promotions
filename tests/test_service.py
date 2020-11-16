@@ -132,21 +132,30 @@ class TestPromotionService(TestCase):
             "Is Site Wide bool does not match",
         )
 
-    def test_create_product(self):
-        """ Create a new Product """
-        test_product = ProductFactory()
-        logging.debug(test_product)
+    def test_create_promotion_with_product(self):
+        """ Create a new Promotion """
         resp = self.app.post(
-            "/products",
-            json=test_product.serialize(),
+            "/promotions",
+            json=
+            {
+                "id": 1,
+                "title": "Halloween Special",
+                "description": "Some items off in honor of the spookiest month.",
+                "promo_code": "hween",
+                "promo_type": "DISCOUNT",
+                "amount": 25,
+                "start_date": "2020-10-20T00:00:00",
+                "end_date": "2020-11-01T00:00:00",
+                "is_site_wide": False,
+                "products": [123, 456]
+            },
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        # Check the data is correct
-        new_product = resp.get_json()
-        self.assertEqual(
-            new_product["id"], test_product.id, "IDs do not match"
-        )
+        # Check the promotion got created
+        new_promotion = resp.get_json()
+        self.assertEqual(new_promotion["title"], "Halloween Special", "Title does not match")
+        self.assertEqual(new_promotion["products"], [123, 456], "Products does not match")
 
     def test_get_promotion(self):
         """ Get a single Promotion """

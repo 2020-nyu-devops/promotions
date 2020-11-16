@@ -80,23 +80,6 @@ class Product(db.Model):
         logger.info("Processing all Products")
         return cls.query.all()
 
-    def serialize(self):
-        """ Serializes a Product into a dictionary """
-        return {"id": self.id}
-
-    def deserialize(self, data):
-        """
-        Deserializes a Product from a dictionary
-        """
-        try:
-            self.id = data["id"]
-        except KeyError as error:
-            raise DataValidationError("Invalid promotion: missing id field")
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid product: body of request contained bad or no data"
-            )
-        return self
 
 # pylint: disable=raise-missing-from
 class Promotion(db.Model):
@@ -270,12 +253,7 @@ class Promotion(db.Model):
             self.products = []
             for product_id in data["products"]:
                 product = Product.query.get(product_id)
-                if product is None:
-                    raise DataValidationError(
-                        "Promotion has a product with an ID that does not exist"
-                    )
-                else:
-                    self.products.append(product)
+                self.products.append(product)
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:
