@@ -37,3 +37,15 @@ Scenario: List all active site-wide BOGO promotions
     And I should not see "Promo1" in the results
     And I should not see "Promo2" in the results
     And I should not see "Promo4" in the results
+
+Scenario: Delete a Promotion
+    When I visit the "home page"
+    And I set the "id" to "5"
+    And I press the "Delete" button
+    And I press the "Clear" button
+    And I press the "Search" button
+    Then I should see "Promo1" in the results
+    And I should see "Promo2" in the results
+    And I should see "Promo3" in the results
+    And I should see "Promo4" in the results
+    And I should not see "Promo5" in the results
