@@ -14,6 +14,7 @@ $(function () {
         $("#promotion_amount").val(res.amount);
         $("#promotion_start_date").val(res.start_date.substring(0,10));
         $("#promotion_end_date").val(res.end_date.substring(0,10));
+        $("#promotion_products").val(res.products);
         $("#promotion_is_site_wide").prop("checked", res.is_site_wide);
         $("#promotion_active").prop("checked", res.active);
     }
@@ -28,6 +29,7 @@ $(function () {
         $("#promotion_amount").val("");
         $("#promotion_start_date").val("");
         $("#promotion_end_date").val("");
+        $("#promotion_products").val("");
         $("#promotion_is_site_wide").prop("checked", false);
         $("#promotion_active").prop("checked", false);
     }
@@ -65,9 +67,9 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
+            "products" : $("#promotion_products").val().split(","),
             "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
             "active" : $("#promotion_active").is(':checked'),
-            "products" : [],
         };
 
         var ajax = $.ajax({
@@ -213,9 +215,9 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
+            "products" : $("#promotion_products").val().split(","),
             "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
             "active" : $("#promotion_active").is(':checked'),
-            "products" : [],
         };
 
         var ajax = $.ajax({
@@ -287,7 +289,7 @@ $(function () {
             duration : $("#promotion_duration").val(),
             is_site_wide : $("#promotion_is_site_wide").is(':checked') ,  // remi not sure if 1/0 required here ? "1" : "0"
             active : $("#promotion_active").is(':checked') ? "1" : "0",
-            product : $("#promotion_product").val()
+            product : "["+$("#promotion_product").val()+"]"
         });
 
         var ajax = $.ajax({
@@ -310,13 +312,14 @@ $(function () {
             table += '<th>Amount</th>';
             table += '<th>Start Date</th>';
             table += '<th>End Date</th>';
+            table += '<th>Products</th>';
             table += '<th>Site-wide Status</th>';
             table += '</tr>';
 
             var firstPromotion = "";
             for(var i = 0; i < res.length; i++) {
                 var promotion = res[i];
-                var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.is_site_wide+"</td></tr>";
+                var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.products+"</td><td>"+promotion.is_site_wide+"</td></tr>";
                 table += row;
                 if (i == 0) {
                     firstPromotion = promotion;
