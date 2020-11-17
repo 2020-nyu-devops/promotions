@@ -150,29 +150,6 @@ def create_promotions():
     )
 
 ######################################################################
-# ADD A NEW PRODUCT
-######################################################################
-@app.route("/products", methods=["POST"])
-def create_product():
-    """
-    Creates a Product
-    This endpoint will create a Product based the id in the body that is posted
-    """
-    app.logger.info("Request to create a product")
-    check_content_type("application/json")
-    product = Product()
-    product.deserialize(request.get_json())
-    product.create()
-    message = product.serialize()
-    location_url = url_for("get_promotions", promotion_id=product.id, _external=True)
-
-    app.logger.info("Product with ID [%s] created.", product.id)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    )
-
-
-######################################################################
 # LIST ALL THE PROMOTIONS
 ######################################################################
 @app.route("/promotions", methods=["GET"])
