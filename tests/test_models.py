@@ -79,7 +79,6 @@ class TestPromotion(unittest.TestCase):
         products = Product.all()
         self.assertEqual(len(products), 1)
 
-
     def test_add_a_promotion(self):
         """ Create a promotion and add it to the database """
         promotions = Promotion.all()
@@ -115,9 +114,7 @@ class TestPromotion(unittest.TestCase):
             end_date=datetime(2020, 10, 18),
             is_site_wide=True,
         )
-        product = Product(
-            id=123
-        )
+        product = Product(id=123)
         promotion.products.append(product)
         self.assertTrue(product is not None)
         promotion.create()
@@ -128,7 +125,6 @@ class TestPromotion(unittest.TestCase):
         promotions = Promotion.all()
         self.assertEqual(len(products), 1)
         self.assertEqual(len(promotions), 1)
-
 
     def test_update_a_promotion(self):
         """ Update a Promotion """

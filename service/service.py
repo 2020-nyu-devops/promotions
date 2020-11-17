@@ -103,7 +103,8 @@ def internal_server_error(error):
 @app.route("/")
 def index():
     """ Root URL response """
-    return app.send_static_file('index.html')
+    return app.send_static_file("index.html")
+
 
 ######################################################################
 # RETRIEVE A PROMOTION
@@ -133,9 +134,10 @@ def create_promotions():
     app.logger.info("Request to create a promotion")
     check_content_type("application/json")
     json = request.get_json()
-    for product_id in json["products"]:
-        if Product.query.get(product_id) is None:
-            Product(id=product_id).create()
+    if "products" in json:
+        for product_id in json["products"]:
+            if Product.query.get(product_id) is None:
+                Product(id=product_id).create()
     promotion = Promotion()
     promotion.deserialize(json)
     promotion.create()

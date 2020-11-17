@@ -16,7 +16,6 @@ class ProductFactory(factory.Factory):
     id = factory.Sequence(lambda n: n * 100)
 
 
-
 class PromotionFactory(factory.Factory):
     """ Creates fake promotions """
 

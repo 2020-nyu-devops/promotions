@@ -136,8 +136,7 @@ class TestPromotionService(TestCase):
         """ Create a new Promotion """
         resp = self.app.post(
             "/promotions",
-            json=
-            {
+            json={
                 "id": 1,
                 "title": "Halloween Special",
                 "description": "Some items off in honor of the spookiest month.",
@@ -147,15 +146,19 @@ class TestPromotionService(TestCase):
                 "start_date": "2020-10-20T00:00:00",
                 "end_date": "2020-11-01T00:00:00",
                 "is_site_wide": False,
-                "products": [123, 456]
+                "products": [123, 456],
             },
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Check the promotion got created
         new_promotion = resp.get_json()
-        self.assertEqual(new_promotion["title"], "Halloween Special", "Title does not match")
-        self.assertEqual(new_promotion["products"], [123, 456], "Products does not match")
+        self.assertEqual(
+            new_promotion["title"], "Halloween Special", "Title does not match"
+        )
+        self.assertEqual(
+            new_promotion["products"], [123, 456], "Products does not match"
+        )
 
     def test_get_promotion(self):
         """ Get a single Promotion """

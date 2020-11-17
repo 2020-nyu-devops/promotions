@@ -73,7 +73,6 @@ class Product(db.Model):
         db.session.add(self)
         db.session.commit()
 
-
     @classmethod
     def all(cls):
         """ Returns all of the Products in the database """
