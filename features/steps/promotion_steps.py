@@ -103,6 +103,7 @@ def step_impl(context, name):
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
 
+
 ##################################################################
 # These two function simulate copy and paste
 ##################################################################
@@ -133,7 +134,6 @@ def step_impl(context, text_string, element_name):
     element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
     # expect(element.get_attribute('value')).to_equal(text_string)
-
     from datetime import date
     if text_string == "$today_date$":
         text = date.today().strftime("%Y-%m-%d")
@@ -144,6 +144,18 @@ def step_impl(context, text_string, element_name):
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id),
             text
+        )
+    )
+    expect(found).to_be(True)
+
+@then('I should see the message "{message}"')
+def step_impl(context, message):
+    # element = context.driver.find_element_by_id('flash_message')
+    # expect(element.text).to_contain(message)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'flash_message'),
+            message
         )
     )
     expect(found).to_be(True)
