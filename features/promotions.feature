@@ -38,14 +38,36 @@ Scenario: List all active site-wide BOGO promotions
     And I should not see "Promo2" in the results
     And I should not see "Promo4" in the results
 
+#Scenario: List all site-wide promotions
+#    When I visit the "home page"
+#    And I check the "is_site_wide" checkbox
+#    And I press the "Search" button
+#    Then I should not see "Promo3" in the results
+#    And I should see "Promo5" in the results
+#    And I should see "Promo1" in the results
+#    And I should not see "Promo2" in the results
+#    And I should see "Promo4" in the results
+
+
 Scenario: Delete a Promotion
     When I visit the "home page"
-    And I set the "id" to "5"
+    And I set the "title" to "Promo5"
+    And I check the "is_site_wide" checkbox
+    And I press the "Search" button
+    Then I should see "Promo5" in the "title" field
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
     And I press the "Delete" button
     And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "404 Not Found"
+    When I press the "Clear" button
+    And I check the "is_site_wide" checkbox
     And I press the "Search" button
-    Then I should see "Promo1" in the results
-    And I should see "Promo2" in the results
-    And I should see "Promo3" in the results
+    Then I should not see "Promo5" in the results
     And I should see "Promo4" in the results
-    And I should not see "Promo5" in the results
+#    And I should see "Promo1" in the results
+#    And I should see "Promo2" in the results
+#    And I should see "Promo4" in the results
