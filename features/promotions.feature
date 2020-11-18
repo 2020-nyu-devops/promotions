@@ -17,7 +17,16 @@ Scenario: The server is running
     Then I should see "Promotion RESTful Service"
     And I should not see "404 Not Found"
 
-Scenario: List all active site-wide BOGO promotions 
+Scenario: List all promotions
+    When I visit the "home page"
+    And I press the "List" button
+    Then I should see "Promo1" in the results
+    Then I should see "Promo2" in the results
+    Then I should see "Promo3" in the results
+    Then I should see "Promo4" in the results
+    Then I should see "Promo5" in the results
+
+Scenario: List all active site-wide BOGO promotions
     When I visit the "home page"
     And I select "BOGO" in the "promo_type" dropdown
     And I check the "is_site_wide" checkbox
