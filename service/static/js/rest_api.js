@@ -15,7 +15,7 @@ $(function () {
         $("#promotion_start_date").val(res.start_date.substring(0,10));
         $("#promotion_end_date").val(res.end_date.substring(0,10));
         $("#promotion_is_site_wide").prop("checked", res.is_site_wide);
-        $("#promotion_active").prop("checked", res.active);
+        $("#promotion_active").prop("checked", res.active == 1);
     }
 
     /// Clears all form fields
@@ -66,7 +66,7 @@ $(function () {
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
             "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "active" : $("#promotion_active").is(':checked'),
+            "active" : $("#promotion_active").is(':checked') ? 1 : 0,
             "products" : [],
         };
 
@@ -159,7 +159,7 @@ $(function () {
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
             "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "active" : $("#promotion_active").is(':checked'),
+            "active" : $("#promotion_active").is(':checked') ? 1 : 0,
             "products" : [],
         };
 
@@ -231,7 +231,7 @@ $(function () {
             end_date : $("#promotion_end_date").val(),
             duration : $("#promotion_duration").val(),
             is_site_wide : $("#promotion_is_site_wide").is(':checked') ,  // remi not sure if 1/0 required here ? "1" : "0"
-            active : $("#promotion_active").is(':checked') ? "1" : "0",
+            active : $("#promotion_active").is(':checked') ? 1 : 0,
             product : $("#promotion_product").val()
         });
 
@@ -245,7 +245,7 @@ $(function () {
         ajax.done(function(res){
             //alert(res.toSource())
             $("#search_results").empty();
-            table = '<table class="table-striped table-bordered">';
+            var table = '<table class="table-striped table-bordered">';
             table += '<tr>';
             table += '<th>ID</th>';
             table += '<th>Title</th>';

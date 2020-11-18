@@ -16,6 +16,9 @@ Promotion - A Promotion used in the eCommerce website
 - end_date: (date) the ending date
 - is_site_wide: (bool) whether the promotion is site wide
                 (not associated with only certain product(s))
+- active: (int) whether the promotion is active(which means the start_date 
+                is less than today and end_date is greater than today)
+                1 means active, while 0 means inactive
 -----------
 promotion_products - The relationship between promotion and product
 - id: (int) primary key, product_id + promotion_id
@@ -80,6 +83,7 @@ class Promotion(db.Model):
     start_date = db.Column(db.DateTime(), nullable=False)
     end_date = db.Column(db.DateTime(), nullable=False)
     is_site_wide = db.Column(db.Boolean(), nullable=False, default=False)
+    active = db.Column(db.Integer, nullable=False, default=False)
     # for promotion_products Many-to-Many relationship
     products = db.relationship("Product", secondary=promotion_products, lazy="subquery")
 
@@ -207,6 +211,7 @@ class Promotion(db.Model):
             "start_date": self.start_date.isoformat(),
             "end_date": self.end_date.isoformat(),
             "is_site_wide": self.is_site_wide,
+            "active": self.active,
             "products": [product.id for product in self.products],
         }
 
@@ -228,6 +233,7 @@ class Promotion(db.Model):
             self.start_date = data["start_date"]
             self.end_date = data["end_date"]
             self.is_site_wide = data["is_site_wide"]
+            self.active = data["active"]
             self.products = []
             for product_id in data["products"]:
                 product = Product.query.get(product_id)

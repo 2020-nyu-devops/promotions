@@ -22,5 +22,6 @@ class PromotionFactory(factory.Factory):
     )
     amount = 10
     start_date = datetime(2020, 10, 17)
-    end_date = datetime(2020, 10, 18)
+    end_date = datetime(2021, 10, 18)
     is_site_wide = True
+    active = 1
