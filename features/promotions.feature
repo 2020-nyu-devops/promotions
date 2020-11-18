@@ -59,9 +59,9 @@ Scenario: Delete a Promotion
     And I press the "List" button
     Then I should not see "Promo5" in the results
     And I should see "Promo4" in the results
-#    And I should see "Promo1" in the results
-#    And I should see "Promo2" in the results
-#    And I should see "Promo4" in the results
+    And I should see "Promo1" in the results
+    And I should see "Promo2" in the results
+    And I should see "Promo4" in the results
 
     Scenario: List all promotions
         When I visit the "home page"
