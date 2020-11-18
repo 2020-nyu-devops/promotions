@@ -104,7 +104,6 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
-            update_form_data(res)
             flash_message("Promotion canceled")
         });
 
@@ -138,6 +137,62 @@ $(function () {
 
         ajax.fail(function(res){
             clear_form_data()
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // List all Promotion
+    // ****************************************
+
+    $("#list-btn").click(function () {
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/promotions",
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#search_results").empty();
+            table = '<table class="table-striped table-bordered">';
+            table += '<tr>';
+            table += '<th>ID</th>';
+            table += '<th>Title</th>';
+            table += '<th>Description</th>';
+            table += '<th>Promo Code</th>';
+            table += '<th>Promo Type</th>';
+            table += '<th>Amount</th>';
+            table += '<th>Start Date</th>';
+            table += '<th>End Date</th>';
+            table += '<th>Site-wide Status</th>';
+            table += '</tr>';
+
+            var firstPromotion = "";
+            for(var i = 0; i < res.length; i++) {
+                var promotion = res[i];
+                var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.is_site_wide+"</td></tr>";
+                table += row;
+                if (i == 0) {
+                    firstPromotion = promotion;
+                }
+            }
+
+            table += '</table>';
+            $("#search_results").append(table);
+
+            // copy the first result to the form
+            if (firstPromotion != "") {
+                update_form_data(firstPromotion)
+            }
+
+            flash_message("All promotions listed at the table below")
+        });
+
+        ajax.fail(function(res){
             flash_message(res.responseJSON.message)
         });
 
