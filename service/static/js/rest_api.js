@@ -27,6 +27,7 @@ $(function () {
         $("#promotion_promo_code").val("");
         $("#promotion_promo_type").val("");
         $("#promotion_amount").val("");
+        $("#promotion_duration").val("");
         $("#promotion_start_date").val("");
         $("#promotion_end_date").val("");
         $("#promotion_products").val("");
@@ -67,7 +68,7 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
-            "products" : $("#promotion_products").val(),
+            "products" : $("#promotion_products").val().split(","),
             "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
             "active" : $("#promotion_active").is(':checked'),
         };
@@ -290,7 +291,8 @@ $(function () {
             duration : $("#promotion_duration").val(),
             is_site_wide : $("#promotion_is_site_wide").is(':checked') ,  // remi not sure if 1/0 required here ? "1" : "0"
             active : $("#promotion_active").is(':checked') ? "1" : "0",
-            products : "["+$("#promotion_product").val()+"]"
+            product : $("#promotion_products").val()
+            // products : "["+$("#promotion_products").val()+"]"
         });
 
         var ajax = $.ajax({
