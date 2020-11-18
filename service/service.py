@@ -193,7 +193,12 @@ def update_promotions(promotion_id):
     promotion = Promotion.find(promotion_id)
     if not promotion:
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
-    promotion.deserialize(request.get_json())
+    json = request.get_json()
+    if "products" in json:
+        for product_id in json["products"]:
+            if Product.query.get(product_id) is None:
+                Product(id=product_id).create()
+    promotion.deserialize(json)
     promotion.id = promotion_id
     promotion.update()
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
