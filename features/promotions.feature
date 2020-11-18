@@ -51,4 +51,4 @@ Feature: The promotion service back-end
         And I press the "Retrieve" button
         Then I should see "Promo1" in the "title" field
         # TODO: need to figure out how to put today() in here
-        And I should see "2020-11-18" in the "end_date" field
+        And I should see "$today_date$" in the "end_date" field
