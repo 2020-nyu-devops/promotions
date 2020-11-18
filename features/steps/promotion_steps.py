@@ -2,7 +2,6 @@ import json
 import logging
 import requests
 from os import getenv
-from service import app
 from compare import expect, ensure
 from behave import given, when, then
 from selenium.webdriver.common.by import By
