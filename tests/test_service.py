@@ -205,6 +205,7 @@ class TestPromotionService(TestCase):
         # update the promotion
         new_promotion = resp.get_json()
         new_promotion["title"] = "unknown"
+        new_promotion["products"] = [123]
         resp = self.app.put(
             "/promotions/{}".format(new_promotion["id"]),
             json=new_promotion,
@@ -213,6 +214,7 @@ class TestPromotionService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_promotion = resp.get_json()
         self.assertEqual(updated_promotion["title"], "unknown")
+        self.assertEqual(updated_promotion["products"], [123])
 
         # check that trying to update a non-existent promotion returns 404 not found
         resp = self.app.put(
