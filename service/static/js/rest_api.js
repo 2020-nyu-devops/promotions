@@ -14,8 +14,8 @@ $(function () {
         $("#promotion_amount").val(res.amount);
         $("#promotion_start_date").val(res.start_date.substring(0,10));
         $("#promotion_end_date").val(res.end_date.substring(0,10));
-        $("#promotion_is_site_wide").prop("checked", res.is_site_wide);
-        $("#promotion_active").prop("checked", res.active);
+        $("#promotion_is_site_wide").val(res.is_site_wid);
+        $("#promotion_active").val(res.active);
     }
 
     /// Clears all form fields
@@ -28,8 +28,8 @@ $(function () {
         $("#promotion_amount").val("");
         $("#promotion_start_date").val("");
         $("#promotion_end_date").val("");
-        $("#promotion_is_site_wide").prop("checked", false);
-        $("#promotion_active").prop("checked", false);
+        $("#promotion_is_site_wide").val("");
+        $("#promotion_active").val("");
     }
 
     function clear_search_table(){
@@ -65,8 +65,8 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
-            "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "active" : $("#promotion_active").is(':checked'),
+            "is_site_wide" : $("#promotion_is_site_wide").val(),
+            "active" : $("#promotion_active").val(),
             "products" : [],
         };
 
@@ -213,8 +213,8 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
-            "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "active" : $("#promotion_active").is(':checked'),
+            "is_site_wide" : $("#promotion_is_site_wide").val(),
+            "active" : $("#promotion_active").val(),
             "products" : [],
         };
 
@@ -285,8 +285,8 @@ $(function () {
             start_date : $("#promotion_start_date").val(),
             end_date : $("#promotion_end_date").val(),
             duration : $("#promotion_duration").val(),
-            is_site_wide : $("#promotion_is_site_wide").is(':checked') ,  // remi not sure if 1/0 required here ? "1" : "0"
-            active : $("#promotion_active").is(':checked') ? "1" : "0",
+            is_site_wide : $("#promotion_is_site_wide").val(),
+            active : $("#promotion_active").val(),
             product : $("#promotion_product").val()
         });
 
