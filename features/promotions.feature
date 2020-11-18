@@ -17,15 +17,6 @@ Scenario: The server is running
     Then I should see "Promotion RESTful Service"
     And I should not see "404 Not Found"
 
-Scenario: List all promotions
-    When I visit the "home page"
-    And I press the "List" button
-    Then I should see "Promo1" in the results
-    Then I should see "Promo2" in the results
-    Then I should see "Promo3" in the results
-    Then I should see "Promo4" in the results
-    Then I should see "Promo5" in the results
-
 Scenario: List all active site-wide BOGO promotions
     When I visit the "home page"
     And I select "BOGO" in the "promo_type" dropdown
@@ -49,7 +40,6 @@ Scenario: List all site-wide promotions
     And I should not see "Promo2" in the results
     And I should see "Promo4" in the results
 
-
 Scenario: Delete a Promotion
     When I visit the "home page"
     And I set the "title" to "Promo5"
@@ -72,3 +62,27 @@ Scenario: Delete a Promotion
 #    And I should see "Promo1" in the results
 #    And I should see "Promo2" in the results
 #    And I should see "Promo4" in the results
+
+    Scenario: List all promotions
+        When I visit the "home page"
+        And I press the "List" button
+        Then I should see "Promo1" in the results
+        Then I should see "Promo2" in the results
+        Then I should see "Promo3" in the results
+        Then I should see "Promo4" in the results
+        Then I should see "Promo5" in the results
+
+    Scenario: Cancel a promotion
+        When I visit the "home page"
+        And I press the "List" button
+        Then I should see "Promo1" in the "title" field
+        When I copy the "Id" field
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Cancel" button
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Retrieve" button
+        Then I should see "Promo1" in the "title" field
+        # TODO: need to figure out how to put today() in here
+        And I should see "$today_date$" in the "end_date" field
