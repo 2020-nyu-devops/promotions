@@ -59,7 +59,6 @@ class TestPromotion(unittest.TestCase):
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2021, 10, 18),
             is_site_wide=True,
-            active=1,
         )
         self.assertTrue(promotion is not None)
         self.assertEqual(promotion.id, None)
@@ -69,7 +68,6 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.start_date, datetime(2020, 10, 17))
         self.assertEqual(promotion.end_date, datetime(2021, 10, 18))
         self.assertEqual(promotion.is_site_wide, True)
-        self.assertEqual(promotion.active, 1)
 
     def test_add_a_promotion(self):
         """ Create a promotion and add it to the database """
@@ -82,7 +80,6 @@ class TestPromotion(unittest.TestCase):
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2021, 10, 18),
             is_site_wide=True,
-            active=1,
         )
         self.assertTrue(promotion is not None)
         self.assertEqual(promotion.id, None)
@@ -101,7 +98,6 @@ class TestPromotion(unittest.TestCase):
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2021, 10, 18),
             is_site_wide=True,
-            active=1,
         )
         promotion.create()
         self.assertEqual(promotion.id, 1)
@@ -123,7 +119,6 @@ class TestPromotion(unittest.TestCase):
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2021, 10, 18),
             is_site_wide=True,
-            active=1,
         )
         try:
             promotion.update()
@@ -139,7 +134,6 @@ class TestPromotion(unittest.TestCase):
             start_date=datetime(2020, 10, 17),
             end_date=datetime(2021, 10, 18),
             is_site_wide=True,
-            active=1,
         )
         promotion.create()
         self.assertEqual(len(Promotion.all()), 1)
@@ -163,7 +157,6 @@ class TestPromotion(unittest.TestCase):
             start_date=datetime(2020, 10, 20),
             end_date=datetime(2020, 11, 1),
             is_site_wide=True,
-            active=0,
         )
         product_1 = Product()
         product_1.id = 123
@@ -183,7 +176,6 @@ class TestPromotion(unittest.TestCase):
                 "start_date": "2020-10-20T00:00:00",
                 "end_date": "2020-11-01T00:00:00",
                 "is_site_wide": True,
-                "active": 0,
                 "products": [123, 456],
             },
         )
@@ -200,7 +192,6 @@ class TestPromotion(unittest.TestCase):
             start_date=datetime(2020, 11, 1),
             end_date=datetime(2099, 11, 30),
             is_site_wide=False,
-            active=1,
         )
         product_1 = Product()
         product_1.id = 123
@@ -225,7 +216,6 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.start_date, "2020-11-01T00:00:00")
         self.assertEqual(promotion.end_date, "2099-11-30T00:00:00")
         self.assertEqual(promotion.is_site_wide, False)
-        self.assertEqual(promotion.active, 1)
         self.assertEqual(
             [product.id for product in promotion.products],
             [123, 456],
@@ -261,7 +251,6 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.start_date, promotions[1].start_date)
         self.assertEqual(promotion.end_date, promotions[1].end_date)
         self.assertEqual(promotion.is_site_wide, promotions[1].is_site_wide)
-        self.assertEqual(promotion.active, promotions[1].active)
 
     def test_find_or_404_not_found(self):
         """ Find or return 404 NOT found """

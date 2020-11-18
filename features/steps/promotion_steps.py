@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait, Select
 
-WAIT_SECONDS = int(getenv('WAIT_SECONDS', '120'))
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '10'))
 ID_PREFIX = 'promotion_'
 
 @given('the following promotions')
@@ -35,24 +35,20 @@ def step_impl(context):
             "start_date": row['start_date'],
             "end_date": row['end_date'],
             "is_site_wide": row['is_site_wide'] in ['True', 'true', '1'],
-            "active": row['active'],
             "products": row['products']
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
 
-
 @when(u'I visit the "home page"')
 def step_impl(context):
     """ GET Request to the home URL """
     context.driver.get(context.base_url)
 
-
 @then('I should see "{message}"')
 def step_impl(context, message):
     expect(context.driver.title).to_contain(message)
-
 
 @then('I should not see "{message}"')
 def step_impl(context, message):
@@ -91,11 +87,6 @@ def step_impl(context, name):
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
 
-
-
-
-
-
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower()
@@ -103,17 +94,12 @@ def step_impl(context, element_name, text_string):
     element.clear()
     element.send_keys(text_string)
 
-
-
-
-#double check
 @then('the "{element_name}" checkbox should be empty')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
     element = context.driver.find_element_by_id(element_id).is_selected()
     expect(element).to_be(False)
 
-#double check
 @then('the "{element_name}" checkbox should be checked')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
@@ -138,9 +124,6 @@ def step_impl(context, element_name):
     element = context.driver.find_element_by_id(element_id)
     expect(element.get_attribute('value')).to_be(u'')
 
-
-##################################################################
-# These two function simulate copy and paste
 ##################################################################
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
@@ -162,14 +145,6 @@ def step_impl(context, element_name):
     element.clear()
     element.send_keys(context.clipboard)
 
-##################################################################
-# This code works because of the following naming convention:
-# The buttons have an id in the html hat is the button text
-# in lowercase followed by '-btn' so the Clean button has an id of
-# id='clear-btn'. That allows us to lowercase the name and add '-btn'
-# to get the element id of any button
-##################################################################
-
 @then('I should see the message "{message}"')
 def step_impl(context, message):
     #element = context.driver.find_element_by_id('flash_message')
@@ -181,14 +156,6 @@ def step_impl(context, message):
         )
     )
     expect(found).to_be(True)
-
-
-##################################################################
-# This code works because of the following naming convention:
-# The id field for text input in the html is the element name
-# prefixed by ID_PREFIX so the Name field has an id='pet_name'
-# We can then lowercase the name and prefix with pet_ to get the id
-##################################################################
 
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
@@ -202,4 +169,3 @@ def step_impl(context, text_string, element_name):
         )
     )
     expect(found).to_be(True)
-

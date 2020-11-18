@@ -15,7 +15,6 @@ $(function () {
         $("#promotion_start_date").val(res.start_date.substring(0,10));
         $("#promotion_end_date").val(res.end_date.substring(0,10));
         $("#promotion_is_site_wide").prop("checked", res.is_site_wide);
-        $("#promotion_active").prop("checked", res.active == 1);
     }
 
     /// Clears all form fields
@@ -66,7 +65,6 @@ $(function () {
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
             "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "active" : $("#promotion_active").is(':checked') ? 1 : 0,
             "products" : [],
         };
 
@@ -159,7 +157,6 @@ $(function () {
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
             "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "active" : $("#promotion_active").is(':checked') ? 1 : 0,
             "products" : [],
         };
 
