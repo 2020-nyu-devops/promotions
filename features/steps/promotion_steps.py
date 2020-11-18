@@ -89,3 +89,41 @@ def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
+
+##################################################################
+# These two function simulate copy and paste
+##################################################################
+@when('I copy the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = ID_PREFIX + element_name.lower()
+    # element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    context.clipboard = element.get_attribute('value')
+    logging.info('Clipboard contains: %s', context.clipboard)
+
+
+@when('I paste the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = ID_PREFIX + element_name.lower()
+    # element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    element.clear()
+    element.send_keys(context.clipboard)
+
+
+@then('I should see "{text_string}" in the "{element_name}" field')
+def step_impl(context, text_string, element_name):
+    element_id = ID_PREFIX + element_name.lower()
+    # element = context.driver.find_element_by_id(element_id)
+    # expect(element.get_attribute('value')).to_equal(text_string)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element_value(
+            (By.ID, element_id),
+            text_string
+        )
+    )
+    expect(found).to_be(True)

@@ -37,3 +37,18 @@ Feature: The promotion service back-end
         And I should not see "Promo1" in the results
         And I should not see "Promo2" in the results
         And I should not see "Promo4" in the results
+
+    Scenario: Cancel a promotion
+        When I visit the "home page"
+        And I press the "List" button
+        Then I should see "Promo1" in the "title" field
+        When I copy the "Id" field
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Cancel" button
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Retrieve" button
+        Then I should see "Promo1" in the "title" field
+        # TODO: need to figure out how to put today() in here
+        And I should see "2020-11-18" in the "end_date" field
