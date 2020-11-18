@@ -10,7 +10,7 @@ Background:
         | Promo2    | Active promotion              | pro102     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | False        |          |
         | Promo3    | Active promotion              | pro103     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | True         |          |
         | Promo4    | Inactive promotion, site-wide | pro104     | DISCOUNT   | 20     | 09-09-2020 | 10-10-2020 | True         |          |
-        | Promo5    | Active promotion, site-wide   | pro105     | BOGO       | 1      | 09-09-2020 | 10-10-2021 | True         |          |
+        | Promo5    | Active promotion, site-wide   | pro105     | BOGO       | 5      | 09-09-2020 | 10-10-2021 | True         |          |
     
 Scenario: The server is running
     When I visit the "home page"
@@ -29,8 +29,8 @@ Scenario: List all promotions
 Scenario: List all active site-wide BOGO promotions
     When I visit the "home page"
     And I select "BOGO" in the "promo_type" dropdown
-    And I check the "is_site_wide" checkbox
-    And I check the "active" checkbox
+    And I select "Yes" in the "is_site_wide" dropdown
+    And I select "Yes" in the "active" dropdown
     And I press the "Search" button
     Then I should see "Promo3" in the results
     And I should see "Promo5" in the results
@@ -38,21 +38,23 @@ Scenario: List all active site-wide BOGO promotions
     And I should not see "Promo2" in the results
     And I should not see "Promo4" in the results
 
-#Scenario: List all site-wide promotions
-#    When I visit the "home page"
-#    And I check the "is_site_wide" checkbox
-#    And I press the "Search" button
-#    Then I should not see "Promo3" in the results
-#    And I should see "Promo5" in the results
-#    And I should see "Promo1" in the results
-#    And I should not see "Promo2" in the results
-#    And I should see "Promo4" in the results
+Scenario: List all site-wide promotions
+    When I visit the "home page"
+    And I press the "Clear" button
+    And I select "Yes" in the "is_site_wide" dropdown
+    And I press the "Search" button
+    Then I should see "Promo3" in the results
+    And I should see "Promo5" in the results
+    And I should see "Promo1" in the results
+    And I should not see "Promo2" in the results
+    And I should see "Promo4" in the results
 
 
 Scenario: Delete a Promotion
     When I visit the "home page"
     And I set the "title" to "Promo5"
-    And I check the "is_site_wide" checkbox
+    And I set the "amount" to "5"
+    And I select "BOGO" in the "promo_type" dropdown
     And I press the "Search" button
     Then I should see "Promo5" in the "title" field
     When I copy the "Id" field
@@ -64,8 +66,7 @@ Scenario: Delete a Promotion
     And I press the "Retrieve" button
     Then I should see the message "404 Not Found"
     When I press the "Clear" button
-    And I check the "is_site_wide" checkbox
-    And I press the "Search" button
+    And I press the "List" button
     Then I should not see "Promo5" in the results
     And I should see "Promo4" in the results
 #    And I should see "Promo1" in the results
