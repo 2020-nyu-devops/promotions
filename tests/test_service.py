@@ -81,7 +81,7 @@ class TestPromotionService(TestCase):
         """ Test index call """
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn(b'NYU DevOps eCommerce Promotions', resp.data)
+        self.assertIn(b"NYU DevOps eCommerce Promotions", resp.data)
 
     def test_create_promotion(self):
         """ Create a new Promotion """
@@ -268,7 +268,7 @@ class TestPromotionService(TestCase):
                 "amount": 10,
                 "is_site_wide": True,
                 "start_date": datetime(2020, 10, 21),
-                "end_date": datetime(2020, 10, 23),
+                "end_date": datetime(2021, 10, 23),
             },
             {
                 "title": "2",
@@ -292,6 +292,9 @@ class TestPromotionService(TestCase):
         tests = [
             ("is_site_wide=true", 1),
             ("is_site_wide=true&product=100", 0),
+            ("is_site_wide=true&active=1", 1),
+            ("is_site_wide=false&active=0", 2),
+            ("is_site_wide=true&title=3", 0),
             ("is_site_wide=false", 3),
             ("is_site_wide=false&product=200", 1),
             ("promo_code=XYZ0004", 0),
@@ -300,12 +303,16 @@ class TestPromotionService(TestCase):
             ("amount=20&is_site_wide=false", 1),
             ("amount=20&is_site_wide=true", 0),
             ("promo_type=DISCOUNT&is_site_wide=true", 1),
+            ("start_date=2020-10-17T00:00:00", 1),
             ("promo_type=BOGO", 1),
-            ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 2),
-            ("start_date=Tue, 14 Oct 2020 00:00:00 GMT&end_date=Wed, 18 Oct 2020 00:00:00 GMT", 1),
-            ("duration=4", 3),
-            ("active=0", 3),
-            ("active=1", 1),
+            ("start_date=Sat, 17 Oct 2020 00:00:00 GMT", 1),
+            (
+                "start_date=Tue, 14 Oct 2020 00:00:00 GMT&end_date=Wed, 18 Oct 2020 00:00:00 GMT",
+                1,
+            ),
+            ("duration=4", 2),
+            ("active=0", 2),
+            ("active=1", 2),
             ("product=100", 3),
             ("product=200", 1),
             ("", 4),

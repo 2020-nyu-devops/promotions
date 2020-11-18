@@ -39,11 +39,14 @@ db = SQLAlchemy()
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
+
 class PromoType(Enum):
     """ Enumeration of valid promotion types"""
+
     BOGO = 1  # buy X get 1 free
     DISCOUNT = 2  # X% off
     FIXED = 3  # $X off
+
 
 # pylint: disable=line-too-long
 promotion_products = db.Table('promotion_products',
@@ -123,22 +126,30 @@ class Promotion(db.Model):
     def find_by_query_string(cls, args):
         """ Find a Promotion by query string """
         logger.info(" Processing lookup based on query string %s ...", args)
-        filters = {}
-        for f in ["is_site_wide", "promo_code", "amount", "promo_type"]:
-            if f in args:
-                filters[f] = args.get(f)
-        data = cls.query.filter_by(**filters) if filters else cls.query
+        data = cls.query
+        if "id" in args:
+            data = data.filter(cls.id == args["id"])
+        if "title" in args:
+            data = data.filter(cls.title == args["title"])
+        if "promo_code" in args:
+            data = data.filter(cls.promo_code == args["promo_code"])
+        if "promo_type" in args:
+            data = data.filter(cls.promo_type == args["promo_type"])
+        if "amount" in args:
+            data = data.filter(cls.amount == args["amount"])
+        if "is_site_wide" in args:
+            data = data.filter(cls.is_site_wide == args["is_site_wide"])
         if "start_date" in args:
             data = data.filter(
-                cls.start_date >= dateutil.parser.parse(args["start_date"])
+                cls.start_date == dateutil.parser.parse(args["start_date"])
             )
         if "end_date" in args:
-            data = data.filter(cls.end_date <= dateutil.parser.parse(args["end_date"]))
+            data = data.filter(cls.end_date == dateutil.parser.parse(args["end_date"]))
         if "duration" in args:
-            # returns promotions that last at least the number of days specified
+            # returns promotions that last the number of days specified
             data = data.filter(
                 cls.start_date + timedelta(days=int(args.get("duration")))
-                >= cls.end_date
+                == cls.end_date
             )
         if "active" in args:
             if args.get("active") == "1":
