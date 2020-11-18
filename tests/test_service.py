@@ -14,7 +14,7 @@ from flask_api import status  # HTTP Status Codes
 from service.models import Promotion, DataValidationError, db, PromoType, Product
 from service import app
 from service.service import init_db
-from .factories import PromotionFactory
+from .factories import PromotionFactory, ProductFactory
 from freezegun import freeze_time
 
 
@@ -132,6 +132,34 @@ class TestPromotionService(TestCase):
             "Is Site Wide bool does not match",
         )
 
+    def test_create_promotion_with_product(self):
+        """ Create a new Promotion """
+        resp = self.app.post(
+            "/promotions",
+            json={
+                "id": 1,
+                "title": "Halloween Special",
+                "description": "Some items off in honor of the spookiest month.",
+                "promo_code": "hween",
+                "promo_type": "DISCOUNT",
+                "amount": 25,
+                "start_date": "2020-10-20T00:00:00",
+                "end_date": "2020-11-01T00:00:00",
+                "is_site_wide": False,
+                "products": [123, 456],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # Check the promotion got created
+        new_promotion = resp.get_json()
+        self.assertEqual(
+            new_promotion["title"], "Halloween Special", "Title does not match"
+        )
+        self.assertEqual(
+            new_promotion["products"], [123, 456], "Products does not match"
+        )
+
     def test_get_promotion(self):
         """ Get a single Promotion """
         # get the id of a promotion
@@ -177,6 +205,7 @@ class TestPromotionService(TestCase):
         # update the promotion
         new_promotion = resp.get_json()
         new_promotion["title"] = "unknown"
+        new_promotion["products"] = [123]
         resp = self.app.put(
             "/promotions/{}".format(new_promotion["id"]),
             json=new_promotion,
@@ -185,6 +214,7 @@ class TestPromotionService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_promotion = resp.get_json()
         self.assertEqual(updated_promotion["title"], "unknown")
+        self.assertEqual(updated_promotion["products"], [123])
 
         # check that trying to update a non-existent promotion returns 404 not found
         resp = self.app.put(

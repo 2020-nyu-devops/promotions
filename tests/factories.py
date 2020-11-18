@@ -4,7 +4,16 @@ Test Factory to make fake objects for testing
 from datetime import datetime
 import factory
 from factory.fuzzy import FuzzyChoice
-from service.models import Promotion, PromoType
+from service.models import Promotion, PromoType, Product
+
+
+class ProductFactory(factory.Factory):
+    """ Creates fake products """
+
+    class Meta:
+        model = Product
+
+    id = factory.Sequence(lambda n: n * 100)
 
 
 class PromotionFactory(factory.Factory):
