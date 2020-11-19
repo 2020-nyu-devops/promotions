@@ -43,26 +43,22 @@ def step_impl(context):
         context.resp = requests.post(create_url, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
 
+
 @when(u'I visit the "home page"')
 def step_impl(context):
     """ GET Request to the home URL """
     context.driver.get(context.base_url)
 
+
 @then('I should see "{message}"')
 def step_impl(context, message):
     expect(context.driver.title).to_contain(message)
 
+
 @then('I should not see "{message}"')
+def step_impl(context, message):
     error_message = u'I should not see {message} in {context.resp.text}'
     ensure(message in context.resp.text, False, error_message)
-
-
-@when('I set the "{element_name}" to "{text_string}"')
-def step_impl(context, element_name, text_string):
-    element_id = ID_PREFIX + element_name.lower()
-    element = context.driver.find_element_by_id(element_id)
-    element.clear()
-    element.send_keys(text_string)
 
 
 @when('I select "{text}" in the "{element_name}" dropdown')
@@ -76,6 +72,7 @@ def step_impl(context, text, element_name):
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
     context.driver.find_element_by_id(element_id).click()
+
 
 ####################################################################
 # This code works because of the following naming convention:
@@ -106,6 +103,7 @@ def step_impl(context, name):
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
 
+
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower()
@@ -113,11 +111,13 @@ def step_impl(context, element_name, text_string):
     element.clear()
     element.send_keys(text_string)
 
+
 @then('I should see "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
     element_id = ID_PREFIX + element_name.lower()
     element = Select(context.driver.find_element_by_id(element_id))
     expect(element.first_selected_option.text).to_equal(text)
+
 
 @then('the "{element_name}" field should be empty')
 def step_impl(context, element_name):
@@ -138,6 +138,7 @@ def step_impl(context, element_name):
     context.clipboard = element.get_attribute("value")
     logging.info("Clipboard contains: %s", context.clipboard)
 
+
 @when('I paste the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
@@ -147,6 +148,7 @@ def step_impl(context, element_name):
     )
     element.clear()
     element.send_keys(context.clipboard)
+
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
@@ -159,6 +161,7 @@ def step_impl(context, message):
         )
     )
     expect(found).to_be(True)
+
 
 ##########################################################################
 # This code works because of the following naming convention:
@@ -181,18 +184,6 @@ def step_impl(context, text_string, element_name):
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id), text
-        )
-    )
-    expect(found).to_be(True)
-
-
-@then('I should see the message "{message}"')
-def step_impl(context, message):
-    # element = context.driver.find_element_by_id('flash_message')
-    # expect(element.text).to_contain(message)
-    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, "flash_message"), message
         )
     )
     expect(found).to_be(True)
