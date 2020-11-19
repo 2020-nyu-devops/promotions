@@ -2,7 +2,6 @@ import json
 import logging
 import requests
 from os import getenv
-from service import app
 from compare import expect, ensure
 from behave import given, when, then
 from selenium.webdriver.common.by import By
@@ -125,6 +124,8 @@ def step_impl(context, element_name):
     expect(element.get_attribute('value')).to_be(u'')
 
 ##################################################################
+# These two function simulate copy and paste
+##################################################################
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
@@ -160,12 +161,19 @@ def step_impl(context, message):
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
     element_id = ID_PREFIX + element_name.lower()
-    #element = context.driver.find_element_by_id(element_id)
-    #expect(element.get_attribute('value')).to_equal(text_string)
+    # element = context.driver.find_element_by_id(element_id)
+    # expect(element.get_attribute('value')).to_equal(text_string)
+
+    from datetime import date
+    if text_string == "$today_date$":
+        text = date.today().strftime("%Y-%m-%d")
+    else:
+        text = text_string
+
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id),
-            text_string
+            text
         )
     )
     expect(found).to_be(True)

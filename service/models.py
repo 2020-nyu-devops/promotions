@@ -56,7 +56,28 @@ promotion_products = db.Table('promotion_products',
 
 
 class Product(db.Model):
+    """
+    Class that represents a Product, which just has an ID and no further information.
+
+    This version uses a relational database for persistence which is hidden
+    from us by SQLAlchemy's object relational mappings (ORM)
+    """
+
     id = db.Column(db.Integer, primary_key=True)
+
+    def create(self):
+        """
+        Creates a Product in the database
+        """
+        logger.info("Creating Product with id: %s", self.id)
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the Products in the database """
+        logger.info("Processing all Products")
+        return cls.query.all()
 
 
 # pylint: disable=raise-missing-from
@@ -232,12 +253,7 @@ class Promotion(db.Model):
             self.products = []
             for product_id in data["products"]:
                 product = Product.query.get(product_id)
-                if product is None:
-                    raise DataValidationError(
-                        "Promotion has a product with an ID that does not exist"
-                    )
-                else:
-                    self.products.append(product)
+                self.products.append(product)
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:

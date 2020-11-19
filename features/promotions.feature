@@ -4,18 +4,27 @@ Feature: The promotion service back-end
     So that I can keep track of all the promotions
 
 Background:
-    Given the following promotions
-        | title     | description                   | promo_code | promo_type | amount | start_date | end_date   | is_site_wide | products |
-        | Promo1    | Active promotion, site-wide   | pro101     | DISCOUNT   | 10     | 09-09-2020 | 12-01-2021 | True         |          | 
-        | Promo2    | Active promotion              | pro102     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | False        |          |
-        | Promo3    | Active promotion              | pro103     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | True         |          |
-        | Promo4    | Inactive promotion, site-wide | pro104     | DISCOUNT   | 20     | 09-09-2020 | 10-10-2020 | True         |          |
-        | Promo5    | Active promotion, site-wide   | pro105     | BOGO       | 1      | 09-09-2020 | 10-10-2021 | True         |          |
-    
+        Given the following promotions
+            | title  | description                   | promo_code | promo_type | amount | start_date | end_date   | is_site_wide | products |
+            | Promo1 | Active promotion, site-wide   | pro101     | DISCOUNT   | 10     | 09-09-2020 | 12-01-2021 | True         |          |
+            | Promo2 | Active promotion              | pro102     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | False        |          |
+            | Promo3 | Active promotion              | pro103     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | True         |          |
+            | Promo4 | Inactive promotion, site-wide | pro104     | DISCOUNT   | 20     | 09-09-2020 | 10-10-2020 | True         |          |
+            | Promo5 | Active promotion, site-wide   | pro105     | BOGO       | 1      | 09-09-2020 | 10-10-2021 | True         |          |
+ 
 Scenario: The server is running
     When I visit the "home page"
     Then I should see "Promotion RESTful Service"
     And I should not see "404 Not Found"
+
+Scenario: List all promotions
+        When I visit the "home page"
+        And I press the "List" button
+        Then I should see "Promo1" in the results
+        Then I should see "Promo2" in the results
+        Then I should see "Promo3" in the results
+        Then I should see "Promo4" in the results
+        Then I should see "Promo5" in the results
 
 Scenario: List all active site-wide BOGO promotions 
     When I visit the "home page"
@@ -61,3 +70,18 @@ Scenario: Create a promotion
     And I should see "2020-11-16" in the "start_date" field
     And I should see "2020-12-31" in the "end_date" field
     And the "is_site_wide" checkbox should be checked
+
+Scenario: Cancel a promotion
+        When I visit the "home page"
+        And I press the "List" button
+        Then I should see "Promo1" in the "title" field
+        When I copy the "Id" field
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Cancel" button
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Retrieve" button
+        Then I should see "Promo1" in the "title" field
+        # TODO: need to figure out how to put today() in here
+        And I should see "$today_date$" in the "end_date" field

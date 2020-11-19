@@ -14,7 +14,9 @@ $(function () {
         $("#promotion_amount").val(res.amount);
         $("#promotion_start_date").val(res.start_date.substring(0,10));
         $("#promotion_end_date").val(res.end_date.substring(0,10));
-        $("#promotion_is_site_wide").prop("checked", res.is_site_wide);
+        $("#promotion_products").val(res.products);
+        $("#promotion_is_site_wide").val(res.is_site_wide);
+        $("#promotion_active").val(res.active);
     }
 
     /// Clears all form fields
@@ -25,10 +27,12 @@ $(function () {
         $("#promotion_promo_code").val("");
         $("#promotion_promo_type").val("");
         $("#promotion_amount").val("");
+        $("#promotion_duration").val("");
         $("#promotion_start_date").val("");
         $("#promotion_end_date").val("");
-        $("#promotion_is_site_wide").prop("checked", false);
-        $("#promotion_active").prop("checked", false);
+        $("#promotion_products").val("");
+        $("#promotion_is_site_wide").val("");
+        $("#promotion_active").val("");
     }
 
     function clear_search_table(){
@@ -64,8 +68,8 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
-            "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "products" : [],
+            "products" : $("#promotion_products").val().split(","),
+            "is_site_wide" : $("#promotion_is_site_wide").val(),
         };
 
         var ajax = $.ajax({
@@ -102,7 +106,6 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
-            update_form_data(res)
             flash_message("Promotion canceled")
         });
 
@@ -142,6 +145,63 @@ $(function () {
     });
 
     // ****************************************
+    // List all Promotion
+    // ****************************************
+
+    $("#list-btn").click(function () {
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/promotions",
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#search_results").empty();
+            var table = '<table class="table-striped table-bordered">';
+            table += '<tr>';
+            table += '<th>ID</th>';
+            table += '<th>Title</th>';
+            table += '<th>Description</th>';
+            table += '<th>Promo Code</th>';
+            table += '<th>Promo Type</th>';
+            table += '<th>Amount</th>';
+            table += '<th>Start Date</th>';
+            table += '<th>End Date</th>';
+            table += '<th>Products</th>';
+            table += '<th>Site-wide Status</th>';
+            table += '</tr>';
+
+            var firstPromotion = "";
+            for(var i = 0; i < res.length; i++) {
+                var promotion = res[i];
+                var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.products+"</td><td>"+promotion.is_site_wide+"</td></tr>";
+                table += row;
+                if (i == 0) {
+                    firstPromotion = promotion;
+                }
+            }
+
+            table += '</table>';
+            $("#search_results").append(table);
+
+            // copy the first result to the form
+            if (firstPromotion != "") {
+                update_form_data(firstPromotion)
+            }
+
+            flash_message("All promotions listed at the table below")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
     // Update a Promotion
     // ****************************************
 
@@ -156,8 +216,8 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
-            "is_site_wide" : $("#promotion_is_site_wide").is(':checked'),
-            "products" : [],
+            "products" : $("#promotion_products").val().split(","),
+            "is_site_wide" : $("#promotion_is_site_wide").val(),
         };
 
         var ajax = $.ajax({
@@ -227,9 +287,9 @@ $(function () {
             start_date : $("#promotion_start_date").val(),
             end_date : $("#promotion_end_date").val(),
             duration : $("#promotion_duration").val(),
-            is_site_wide : $("#promotion_is_site_wide").is(':checked') ,  // remi not sure if 1/0 required here ? "1" : "0"
-            active : $("#promotion_active").is(':checked') ? 1 : 0,
-            product : $("#promotion_product").val()
+            product : $("#promotion_products").val(),
+            is_site_wide : $("#promotion_is_site_wide").val(),
+            active : $("#promotion_active").val(),
         });
 
         var ajax = $.ajax({
@@ -252,13 +312,14 @@ $(function () {
             table += '<th>Amount</th>';
             table += '<th>Start Date</th>';
             table += '<th>End Date</th>';
+            table += '<th>Products</th>';
             table += '<th>Site-wide Status</th>';
             table += '</tr>';
 
             var firstPromotion = "";
             for(var i = 0; i < res.length; i++) {
                 var promotion = res[i];
-                var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.is_site_wide+"</td></tr>";
+                var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.products+"</td><td>"+promotion.is_site_wide+"</td></tr>";
                 table += row;
                 if (i == 0) {
                     firstPromotion = promotion;

@@ -16,7 +16,7 @@ from werkzeug.exceptions import NotFound
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import Promotion, DataValidationError
+from service.models import Promotion, DataValidationError, Product
 
 # Import Flask application
 from . import app
@@ -103,7 +103,8 @@ def internal_server_error(error):
 @app.route("/")
 def index():
     """ Root URL response """
-    return app.send_static_file('index.html')
+    return app.send_static_file("index.html")
+
 
 ######################################################################
 # RETRIEVE A PROMOTION
@@ -132,8 +133,13 @@ def create_promotions():
     """
     app.logger.info("Request to create a promotion")
     check_content_type("application/json")
+    json = request.get_json()
+    if "products" in json:
+        for product_id in json["products"]:
+            if Product.query.get(product_id) is None:
+                Product(id=product_id).create()
     promotion = Promotion()
-    promotion.deserialize(request.get_json())
+    promotion.deserialize(json)
     promotion.create()
     message = promotion.serialize()
     location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)
@@ -142,7 +148,6 @@ def create_promotions():
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
-
 
 ######################################################################
 # LIST ALL THE PROMOTIONS
@@ -188,7 +193,12 @@ def update_promotions(promotion_id):
     promotion = Promotion.find(promotion_id)
     if not promotion:
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
-    promotion.deserialize(request.get_json())
+    json = request.get_json()
+    if "products" in json:
+        for product_id in json["products"]:
+            if Product.query.get(product_id) is None:
+                Product(id=product_id).create()
+    promotion.deserialize(json)
     promotion.id = promotion_id
     promotion.update()
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
