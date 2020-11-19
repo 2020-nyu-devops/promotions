@@ -47,7 +47,7 @@ Scenario: Create a promotion
     And I set the "amount" to "1"
     And I set the "start_date" to "11-16-2020"
     And I set the "end_date" to "12-31-2020"
-    And I check the "is_site_wide" checkbox
+    And I select "Yes" in the "is_site_wide" dropdown
     And I press the "Create" button
     Then I should see the message "Promotion successfully created" 
     When I copy the "Id" field
@@ -59,7 +59,6 @@ Scenario: Create a promotion
     And the "amount" field should be empty
     And the "start_date" field should be empty
     And the "end_date" field should be empty
-    And the "is_site_wide" checkbox should be empty
     When I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see "Promo6" in the "title" field
@@ -69,7 +68,7 @@ Scenario: Create a promotion
     And I should see "1" in the "amount" field
     And I should see "2020-11-16" in the "start_date" field
     And I should see "2020-12-31" in the "end_date" field
-    And the "is_site_wide" checkbox should be checked
+    And I should see "Yes" in the "is_site_wide" dropdown
 
 Scenario: Cancel a promotion
         When I visit the "home page"

@@ -15,7 +15,7 @@ $(function () {
         $("#promotion_start_date").val(res.start_date.substring(0,10));
         $("#promotion_end_date").val(res.end_date.substring(0,10));
         $("#promotion_products").val(res.products);
-        $("#promotion_is_site_wide").val(res.is_site_wide);
+        $("#promotion_is_site_wide").val(res.is_site_wide ? "true" : "false");
         $("#promotion_active").val(res.active);
     }
 
@@ -69,7 +69,7 @@ $(function () {
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
             "products" : $("#promotion_products").val().split(","),
-            "is_site_wide" : $("#promotion_is_site_wide").val(),
+            "is_site_wide" : $("#promotion_is_site_wide").val() == "true",
         };
 
         var ajax = $.ajax({
@@ -216,7 +216,7 @@ $(function () {
             "amount" : $("#promotion_amount").val(),
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
-            "products" : $("#promotion_products").val().split(","),
+            "products" : $("#promotion_products").val().trim().split(","),
             "is_site_wide" : $("#promotion_is_site_wide").val(),
         };
 

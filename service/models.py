@@ -101,7 +101,6 @@ class Promotion(db.Model):
     start_date = db.Column(db.DateTime(), nullable=False)
     end_date = db.Column(db.DateTime(), nullable=False)
     is_site_wide = db.Column(db.Boolean(), nullable=False, default=False)
-    active = db.Column(db.Integer, nullable=True, default=0)
     # for promotion_products Many-to-Many relationship
     products = db.relationship("Product", secondary=promotion_products, lazy="subquery")
 
@@ -252,8 +251,9 @@ class Promotion(db.Model):
             self.is_site_wide = data["is_site_wide"]
             self.products = []
             for product_id in data["products"]:
-                product = Product.query.get(product_id)
-                self.products.append(product)
+                if product_id != "":
+                    product = Product.query.get(product_id)
+                    self.products.append(product)
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:

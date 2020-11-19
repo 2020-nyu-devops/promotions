@@ -57,7 +57,7 @@ class TestPromotion(unittest.TestCase):
             promo_type=PromoType.DISCOUNT,
             amount=10,
             start_date=datetime(2020, 10, 17),
-            end_date=datetime(2021, 10, 18),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True,
         )
         self.assertTrue(promotion is not None)
@@ -66,7 +66,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.promo_type, PromoType.DISCOUNT)
         self.assertEqual(promotion.amount, 10)
         self.assertEqual(promotion.start_date, datetime(2020, 10, 17))
-        self.assertEqual(promotion.end_date, datetime(2021, 10, 18))
+        self.assertEqual(promotion.end_date, datetime(2020, 10, 18))
         self.assertEqual(promotion.is_site_wide, True)
 
     def test_create_a_product(self):
@@ -88,7 +88,7 @@ class TestPromotion(unittest.TestCase):
             promo_type=PromoType.DISCOUNT,
             amount=10,
             start_date=datetime(2020, 10, 17),
-            end_date=datetime(2021, 10, 18),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True,
         )
         self.assertTrue(promotion is not None)
@@ -133,7 +133,7 @@ class TestPromotion(unittest.TestCase):
             promo_type=PromoType.DISCOUNT,
             amount=10,
             start_date=datetime(2020, 10, 17),
-            end_date=datetime(2021, 10, 18),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True,
         )
         promotion.create()
@@ -154,7 +154,7 @@ class TestPromotion(unittest.TestCase):
             promo_type=PromoType.DISCOUNT,
             amount=10,
             start_date=datetime(2020, 10, 17),
-            end_date=datetime(2021, 10, 18),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True,
         )
         try:
@@ -169,7 +169,7 @@ class TestPromotion(unittest.TestCase):
             promo_type=PromoType.DISCOUNT,
             amount=10,
             start_date=datetime(2020, 10, 17),
-            end_date=datetime(2021, 10, 18),
+            end_date=datetime(2020, 10, 18),
             is_site_wide=True,
         )
         promotion.create()
@@ -227,7 +227,7 @@ class TestPromotion(unittest.TestCase):
             promo_type=PromoType.DISCOUNT,
             amount=50,
             start_date=datetime(2020, 11, 1),
-            end_date=datetime(2099, 11, 30),
+            end_date=datetime(2020, 11, 30),
             is_site_wide=False,
         )
         product_1 = Product()
@@ -251,7 +251,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.promo_code, "tgiving")
         self.assertEqual(promotion.amount, 50)
         self.assertEqual(promotion.start_date, "2020-11-01T00:00:00")
-        self.assertEqual(promotion.end_date, "2099-11-30T00:00:00")
+        self.assertEqual(promotion.end_date, "2020-11-30T00:00:00")
         self.assertEqual(promotion.is_site_wide, False)
         self.assertEqual(
             [product.id for product in promotion.products],
