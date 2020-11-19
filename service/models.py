@@ -251,8 +251,9 @@ class Promotion(db.Model):
             self.is_site_wide = data["is_site_wide"]
             self.products = []
             for product_id in data["products"]:
-                product = Product.query.get(product_id)
-                self.products.append(product)
+                if product_id != "":
+                    product = Product.query.get(product_id)
+                    self.products.append(product)
         except KeyError as error:
             raise DataValidationError("Invalid promotion: missing " + error.args[0])
         except TypeError as error:
