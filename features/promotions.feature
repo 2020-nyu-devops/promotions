@@ -104,6 +104,31 @@ Feature: The promotion service back-end
     And I should see "2020-12-31" in the "end_date" field
     And I should see "Yes" in the "is_site_wide" dropdown
 
+  Scenario: Update a Promotion
+    When I visit the "Home Page"
+    And I set the "title" to "Promo2"
+    And I press the "Search" button
+    Then I should see "Promo2" in the "title" field
+    And I should see "Active promotion" in the "description" field
+    And I should see "pro102" in the "promo_code" field
+    And I should see "BOGO" in the "promo_type" dropdown
+    And I should see "1" in the "amount" field
+    And I should see "2020-09-09" in the "start_date" field
+    And I should see "2021-12-01" in the "end_date" field
+    And I should see "No" in the "is_site_wide" dropdown
+    When I change "title" to "Promo100"
+    And I press the "Update" button
+    Then I should see the message "Promotion updated"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see "Promo100" in the "title" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see "Promo100" in the results
+    Then I should not see "Promo2" in the results
+
   Scenario: Cancel a promotion
     When I visit the "home page"
     And I press the "List" button
