@@ -159,6 +159,7 @@ def list_promotions():
     """
     app.logger.info("Request to list all promotions")
     filters = [
+        "title",
         "is_site_wide",
         "promo_code",
         "promo_type",
@@ -196,7 +197,7 @@ def update_promotions(promotion_id):
     json = request.get_json()
     if "products" in json:
         for product_id in json["products"]:
-            if Product.query.get(product_id) is None:
+            if product_id != "" and Product.query.get(product_id) is None:
                 Product(id=product_id).create()
     promotion.deserialize(json)
     promotion.id = promotion_id

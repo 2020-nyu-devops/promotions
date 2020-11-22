@@ -217,7 +217,7 @@ $(function () {
             "start_date" : $("#promotion_start_date").val(),
             "end_date" : $("#promotion_end_date").val(),
             "products" : $("#promotion_products").val().trim().split(","),
-            "is_site_wide" : $("#promotion_is_site_wide").val(),
+            "is_site_wide" : $("#promotion_is_site_wide").val() == "true",
         };
 
         var ajax = $.ajax({
@@ -281,6 +281,7 @@ $(function () {
     $("#search-btn").click(function () {
 
         var queryString = encodeGetParams({
+            title : $("#promotion_title").val(),
             promo_code : $("#promotion_promo_code").val(),
             promo_type : $("#promotion_promo_type").val(),
             amount : $("#promotion_amount").val(),
