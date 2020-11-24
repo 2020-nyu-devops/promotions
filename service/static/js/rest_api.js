@@ -31,6 +31,7 @@ $(function () {
         $("#promotion_start_date").val("");
         $("#promotion_end_date").val("");
         $("#promotion_products").val("");
+        $("#promotion_product_pricings").val("");
         $("#promotion_is_site_wide").val("");
         $("#promotion_active").val("");
     }
@@ -343,4 +344,100 @@ $(function () {
         });
 
     });
+
+    // ****************************************
+    // Apply Best Promotion for the products
+    // ****************************************
+
+    $("#apply-btn").click(function () {
+        let products = $("#promotion_products").val().split(",")
+        let pricings = $("#promotion_product_pricings").val().split(",")
+        let queryString = ""
+
+        products.forEach(
+            (product, index) => 
+                queryString = queryString + "&"+ product + "=" + pricings[index])
+        
+        queryString = queryString.substring(1, queryString.length)
+
+        if (queryString.length > 0) {
+            var ajax = $.ajax({
+                type: "GET",
+                url: "/promotions/apply?" + queryString,
+                contentType: "application/json",
+                data: ''
+            })
+    
+            ajax.done(function(results){
+                let output = [];
+                results.forEach(
+                    (result, index) => {
+                        let product_id = Object.keys(result)[0]
+                        let promo_code = result[product_id]
+                        var ajax_internal = $.ajax({
+                            type: "GET",
+                            url: "/promotions?promo_code=" + promo_code,
+                            contentType: "application/json",
+                            data: ''
+                        })
+
+                        ajax_internal.done(function(res){
+                            res[0].products = product_id
+                            output.push(res[0])
+                            flash_message("Promotion retrieved")
+
+                            if (index == results.length - 1) {
+                                display_results(output, false);
+                            }
+                        });
+
+                        ajax_internal.fail(function(res){
+                            flash_message(res.responseJSON.message)
+                        });
+                    })
+            });
+    
+            ajax.fail(function(res){
+                flash_message(res.responseJSON.message)
+            });
+        }
+    });
+
+    let display_results = (results = [], update_form = false) => {
+        $("#search_results").empty();
+        let table = '<table class="table-striped table-bordered">';
+        table += '<tr>';
+        table += '<th>ID</th>';
+        table += '<th>Title</th>';
+        table += '<th>Description</th>';
+        table += '<th>Promo Code</th>';
+        table += '<th>Promo Type</th>';
+        table += '<th>Amount</th>';
+        table += '<th>Start Date</th>';
+        table += '<th>End Date</th>';
+        table += '<th>Products</th>';
+        table += '<th>Site-wide Status</th>';
+        table += '</tr>';
+        
+        var firstPromotion = "";
+        for(var i = 0; i < results.length; i++) {
+            var promotion = results[i];
+            var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.products+"</td><td>"+promotion.is_site_wide+"</td></tr>";
+            table += row;
+            if (i == 0) {
+                firstPromotion = promotion;
+            }
+        }
+
+        table += '</table>';
+        $("#search_results").append(table);
+
+        // copy the first result to the form
+        if (update_form && firstPromotion != "") {
+            update_form_data(firstPromotion)
+        }
+
+        flash_message("Search results at the table below")
+    }
+
  });

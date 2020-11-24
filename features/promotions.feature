@@ -3,16 +3,19 @@ Feature: The promotion service back-end
   I need a RESTful catalog service
   So that I can keep track of all the promotions
 
-  Background:
-    Given the following promotions
-      | title  | description                   | promo_code | promo_type | amount | start_date | end_date   | is_site_wide | products |
-      | Promo1 | Active promotion, site-wide   | pro101     | DISCOUNT   | 10     | 09-09-2020 | 12-01-2021 | True         |          |
-      | Promo2 | Active promotion              | pro102     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | False        |          |
-      | Promo3 | Active promotion              | pro103     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | True         |          |
-      | Promo4 | Inactive promotion, site-wide | pro104     | DISCOUNT   | 20     | 09-09-2020 | 10-10-2020 | True         |          |
-      | Promo5 | Active promotion, site-wide   | pro105     | BOGO       | 5      | 09-09-2020 | 10-10-2021 | True         |          |
-
-  Scenario: The server is running
+Background:
+        Given the following promotions
+            | title     | description                   | promo_code | promo_type | amount | start_date | end_date   | is_site_wide | products     |
+            | Promo1    | Active promotion, site-wide   | pro101     | DISCOUNT   | 10     | 09-09-2020 | 12-01-2021 | True         |              |
+            | Promo2    | Active promotion              | pro102     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | False        |              |
+            | Promo3    | Buy one - get one, site-wide  | pro103     | BOGO       | 1      | 09-09-2020 | 12-01-2021 | True         |              |
+            | Promo4    | Inactive promotion, site-wide | pro104     | DISCOUNT   | 20     | 09-09-2020 | 10-10-2020 | True         |              |
+            | Promo5    | Buy one - get one, site-wide  | pro105     | BOGO       | 5      | 09-09-2020 | 10-10-2021 | True         |              |
+            | Promo6    | 20% Discount for 256, 269     | pro106     | DISCOUNT   | 20     | 09-09-2020 | 10-10-2021 | False        | 101,123      |
+            | Promo7    | 80% Discount for 123, 256     | pro107     | DISCOUNT   | 80     | 09-09-2020 | 10-10-2021 | False        | 123,256      |
+            | Promo8    | 90% Discount for 256, 269     | pro108     | DISCOUNT   | 90     | 09-09-2020 | 10-10-2021 | False        | 256,269      |
+ 
+Scenario: The server is running
     When I visit the "home page"
     Then I should see "Promotion RESTful Service"
     And I should not see "404 Not Found"
@@ -149,7 +152,7 @@ Scenario: Read a promotion
     And I should see "2020-09-09" in the "start_date" field
     And I should see "2021-12-01" in the "end_date" field
     And I should see "No" in the "is_site_wide" dropdown
-    When I change "title" to "Promo100"
+    When I set the "title" to "Promo100"
     And I press the "Update" button
     Then I should see the message "Promotion updated"
     When I copy the "Id" field
@@ -174,5 +177,15 @@ Scenario: Read a promotion
     And I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see "Promo1" in the "title" field
-        # TODO: need to figure out how to put today() in here
+    # TODO: need to figure out how to put today() in here
     And I should see "$today_date$" in the "end_date" field
+
+  Scenario: Apply Best Promotions
+    When I visit the "home page"
+    And I set the "products" to "101,123,256,269"
+    And I set the "product_pricings" to "2000,1000,800,600"
+    And I press the "Apply" button
+    Then I should see "Promo7" in the results
+    And I should see "Promo8" in the results
+    And I should not see "Promo1" in the results
+    And I should not see "Promo2" in the results

@@ -2,14 +2,15 @@ import json
 import logging
 import requests
 from os import getenv
+from datetime import date
 from compare import expect, ensure
 from behave import given, when, then
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait, Select
 
-WAIT_SECONDS = int(getenv("WAIT_SECONDS", "10"))
-ID_PREFIX = "promotion_"
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '10'))
+ID_PREFIX = 'promotion_'
 
 
 @given("the following promotions")
@@ -29,16 +30,16 @@ def step_impl(context):
     create_url = context.base_url + "/promotions"
     for row in context.table:
         data = {
-            "title": row["title"],
-            "description": row["description"],
-            "promo_code": row["promo_code"],
-            "promo_type": row["promo_type"],
-            "amount": row["amount"],
-            "start_date": row["start_date"],
-            "end_date": row["end_date"],
-            "is_site_wide": row["is_site_wide"] in ["True", "true", "1"],
-            "products": row["products"],
-        }
+            "title": row['title'],
+            "description": row['description'],
+            "promo_code": row['promo_code'],
+            "promo_type": row['promo_type'],
+            "amount": row['amount'],
+            "start_date": row['start_date'],
+            "end_date": row['end_date'],
+            "is_site_wide": row['is_site_wide'] in ['True', 'true', '1'],
+            "products": "" if row['products'] == "" else row['products'].split(",")
+            }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
@@ -107,7 +108,9 @@ def step_impl(context, name):
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower()
-    element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
     element.clear()
     element.send_keys(text_string)
 
@@ -174,7 +177,6 @@ def step_impl(context, text_string, element_name):
     element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
     # expect(element.get_attribute('value')).to_equal(text_string)
-    from datetime import date
 
     if text_string == "$today_date$":
         text = date.today().strftime("%Y-%m-%d")
@@ -187,13 +189,3 @@ def step_impl(context, text_string, element_name):
         )
     )
     expect(found).to_be(True)
-
-@when('I change "{element_name}" to "{text_string}"')
-def step_impl(context, element_name, text_string):
-    element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
-    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
-        expected_conditions.presence_of_element_located((By.ID, element_id))
-    )
-    element.clear()
-    element.send_keys(text_string)
