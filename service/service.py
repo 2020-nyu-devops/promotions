@@ -1,9 +1,9 @@
 """
-Promotion Service
+Promotion Service with Swagger
 
 Paths:
 ------
-GET / - Returns a welcome message and 200 code
+GET / - Returns the UI and 200 code, for Selenium testing
 """
 import os
 import sys
@@ -11,6 +11,7 @@ import logging
 from datetime import datetime
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
+from flask_restx import Api, Resource, fields, reqparse, inputs
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
@@ -107,19 +108,80 @@ def index():
 
 
 ######################################################################
-# RETRIEVE A PROMOTION
+# Configure Swagger before initializing it
 ######################################################################
-@app.route("/promotions/<int:promotion_id>", methods=["GET"])
-def get_promotions(promotion_id):
+api = Api(app,
+          version='1.0.0',
+          title='Promotions REST API Service',
+          description='This is the Promotions server.',
+          default='promotions',
+          default_label='Promotions service operations',
+          doc='/api-docs',
+          # authorizations=authorizations,
+          prefix='/'
+         )
+
+# Define the model so that the docs reflect what can be sent
+create_model = api.model('Promotion', {
+    'title': fields.String(required=False,
+                          description='The name of the promotion'),
+    'description': fields.String(required=False,
+                              description='The description of the promotion'),
+    'promo_code': fields.String(required=False,
+                              description='The promo code associated with this promotion'),
+    'promo_type': fields.String(required=False,
+                              description='The type of promotion [BOGO | DISCOUNT | FIXED]'),
+    'amount': fields.Integer(required=False,
+                              description='The amount of the promotion based on promo type'),
+    'start_date': fields.DateTime(required=False,
+                              description='The start date of the promotion'),
+    'end_date': fields.DateTime(required=False,
+                              description='The end date of the promotion'),
+    'is_site_wide': fields.Boolean(required=False,
+                                description='Is the promotion site wide?')
+})
+
+promotion_model = api.inherit(
+    'PromotionModel', 
+    create_model,
+    {
+        'id': fields.Integer(readOnly=True,
+                            description='The unique id assigned internally by service'),
+    }
+)
+
+
+######################################################################
+#  PATH: /promotions/{id}
+######################################################################
+@api.route("/promotions/<int:promotion_id>")
+@api.param('promotion_id', 'The Promotion identifier')
+class PromotionResource(Resource):
     """
-    Retrieve a single Promotion
-    This endpoint will return a Promotion based on it's id
+    PromotionResource class
+
+    Allows the retrieval/manipulation of a single promotion
+    GET /pet/{id} - Returns the promotion with the id
+    PUT /pet/{id} - Update the promotion with the id
+    DELETE /pet/{id} - Delete the promotion with the id
     """
-    app.logger.info("Request for promotion with id: %s", promotion_id)
-    promotion = Promotion.find(promotion_id)
-    if not promotion:
-        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
-    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+
+    ######################################################################
+    # RETRIEVE A PROMOTION
+    ######################################################################
+    @api.doc('get_promotions')
+    @api.response(404, 'Promotion not found')
+    @api.marshal_with(promotion_model)
+    def get(self, promotion_id):
+        """
+        Retrieve a single Promotion
+        This endpoint will return a Promotion based on it's id
+        """
+        app.logger.info("Request for promotion with id: %s", promotion_id)
+        promotion = Promotion.find(promotion_id)
+        if not promotion:
+            raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+        return promotion.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
@@ -142,7 +204,7 @@ def create_promotions():
     promotion.deserialize(json)
     promotion.create()
     message = promotion.serialize()
-    location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)
+    location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
 
     app.logger.info("Promotion with ID [%s] created.", promotion.id)
     return make_response(

@@ -12,8 +12,8 @@ $(function () {
         $("#promotion_promo_code").val(res.promo_code);
         $("#promotion_promo_type").val(res.promo_type);
         $("#promotion_amount").val(res.amount);
-        $("#promotion_start_date").val(res.start_date.substring(0,10));
-        $("#promotion_end_date").val(res.end_date.substring(0,10));
+        if (res.start_date !== undefined) $("#promotion_start_date").val(res.start_date.substring(0,10));
+        if (res.end_date !== undefined) $("#promotion_end_date").val(res.end_date.substring(0,10));
         $("#promotion_products").val(res.products);
         $("#promotion_is_site_wide").val(res.is_site_wide ? "true" : "false");
         $("#promotion_active").val(res.active);
@@ -140,7 +140,8 @@ $(function () {
 
         ajax.fail(function(res){
             clear_form_data()
-            flash_message(res.responseJSON.message)
+            // flash_message(res.responseJSON.message)
+            flash_message(res.status + ' ' + res.statusText)
         });
 
     });

@@ -155,7 +155,8 @@ def step_impl(context, element_name):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
-    #element = context.driver.find_element_by_id('flash_message')
+    element = context.driver.find_element_by_id('flash_message')
+    logging.info(f'Flash message: {element.text}')
     #expect(element.text).to_contain(message)
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
@@ -175,8 +176,8 @@ def step_impl(context, message):
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
     element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
-    # expect(element.get_attribute('value')).to_equal(text_string)
+    element = context.driver.find_element_by_id(element_id)
+    logging.info(f'Values in the {element_name} field: {element.text}')
 
     if text_string == "$today_date$":
         text = date.today().strftime("%Y-%m-%d")
