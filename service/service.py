@@ -161,9 +161,9 @@ class PromotionResource(Resource):
     PromotionResource class
 
     Allows the retrieval/manipulation of a single promotion
-    GET /pet/{id} - Returns the promotion with the id
-    PUT /pet/{id} - Update the promotion with the id
-    DELETE /pet/{id} - Delete the promotion with the id
+    GET /promotion/{id}     - Retrieves the promotion with the id
+    PUT /promotion/{id}     - Update the promotion with the id
+    DELETE /promotion/{id}  - Delete the promotion with the id
     """
 
     ######################################################################
