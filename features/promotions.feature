@@ -57,7 +57,7 @@ Scenario: The server is running
     And I press the "Clear" button
     And I paste the "Id" field
     And I press the "Retrieve" button
-    Then I should see the message "404 Not Found"
+    Then I should see the message "404 NOT FOUND"
     When I press the "Clear" button
     And I press the "List" button
     Then I should not see "Promo5" in the results
