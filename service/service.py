@@ -208,18 +208,37 @@ class PromotionCollection(Resource):
         Creates a Promotion
         This endpoint will create a Promotion based the data in the body that is posted
         """
-        app.logger.info('Request to Create a Promotion')
-        app.logger.debug('Payload = %s', api.payload)
-        if "products" in api.payload:
-            for product_id in api.payload["products"]:
+        app.logger.info("Request to create a promotion")
+        check_content_type("application/json")
+        json = request.get_json()
+        if "products" in json:
+            for product_id in json["products"]:
                 if product_id != "" and Product.query.get(product_id) is None:
                     Product(id=product_id).create()
         promotion = Promotion()
-        promotion.deserialize(api.payload)
+        promotion.deserialize(json)
         promotion.create()
-        app.logger.info('Promotion with new id [%s] saved!', promotion.id)
+        message = promotion.serialize()
         location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
-        return promotion.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
+
+        app.logger.info("Promotion with ID [%s] created.", promotion.id)
+        return make_response(
+            jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+        )
+
+        # app.logger.info('Request to Create a Promotion')
+        # app.logger.debug('Payload = %s', api.payload)
+        # json = request.json()
+        # if "products" in json:
+        #     for product_id in json["products"]:
+        #         if product_id != "" and Product.query.get(product_id) is None:
+        #             Product(id=product_id).create()
+        # promotion = Promotion()
+        # promotion.deserialize(api.payload)
+        # promotion.create()
+        # app.logger.info('Promotion with new id [%s] saved!', promotion.id)
+        # location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
+        # return promotion.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
 
 # ######################################################################
