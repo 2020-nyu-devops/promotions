@@ -58,6 +58,7 @@ class TestPromotionService(TestCase):
         promotions = []
         for _ in range(count):
             test_promotion = PromotionFactory()
+            logging.debug(test_promotion.serialize())
             resp = self.app.post(
                 "/promotions",
                 json=test_promotion.serialize(),
@@ -133,7 +134,7 @@ class TestPromotionService(TestCase):
         )
 
     def test_create_promotion_with_product(self):
-        """ Create a new Promotion """
+        """ Create a new Promotion With Product """
         resp = self.app.post(
             "/promotions",
             json={

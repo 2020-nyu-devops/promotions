@@ -4,6 +4,7 @@ Promotion Service with Swagger
 Paths:
 ------
 GET / - Returns the UI and 200 code, for Selenium testing
+POST /promotions - creates a new Promotion record in the database
 """
 import os
 import sys
@@ -119,34 +120,37 @@ api = Api(app,
           doc='/api-docs',
           # authorizations=authorizations,
           prefix='/'
-         )
+          )
 
 # Define the model so that the docs reflect what can be sent
 create_model = api.model('Promotion', {
     'title': fields.String(required=False,
-                          description='The name of the promotion'),
+                           description='The name of the promotion'),
     'description': fields.String(required=False,
-                              description='The description of the promotion'),
+                                 description='The description of the promotion'),
     'promo_code': fields.String(required=False,
-                              description='The promo code associated with this promotion'),
+                                description='The promo code associated with this promotion'),
     'promo_type': fields.String(required=False,
-                              description='The type of promotion [BOGO | DISCOUNT | FIXED]'),
+                                description='The type of promotion [BOGO | DISCOUNT | FIXED]'),
     'amount': fields.Integer(required=False,
-                              description='The amount of the promotion based on promo type'),
+                             description='The amount of the promotion based on promo type'),
     'start_date': fields.DateTime(required=False,
-                              description='The start date of the promotion'),
+                                  description='The start date of the promotion'),
     'end_date': fields.DateTime(required=False,
-                              description='The end date of the promotion'),
+                                description='The end date of the promotion'),
     'is_site_wide': fields.Boolean(required=False,
-                                description='Is the promotion site wide?')
+                                   description='Is the promotion site wide?'),
+    'products': fields.List(cls_or_instance=fields.Integer, required=False,
+                            description='List of products associated with the promotion.')
+
 })
 
 promotion_model = api.inherit(
-    'PromotionModel', 
+    'PromotionModel',
     create_model,
     {
         'id': fields.Integer(readOnly=True,
-                            description='The unique id assigned internally by service'),
+                             description='The unique id assigned internally by service'),
     }
 )
 
@@ -185,31 +189,39 @@ class PromotionResource(Resource):
 
 
 ######################################################################
-# ADD A NEW PROMOTION
+#  PATH: /promotions
 ######################################################################
-@app.route("/promotions", methods=["POST"])
-def create_promotions():
-    """
-    Creates a Promotion
-    This endpoint will create a Promotion based the data in the body that is posted
-    """
-    app.logger.info("Request to create a promotion")
-    check_content_type("application/json")
-    json = request.get_json()
-    if "products" in json:
-        for product_id in json["products"]:
-            if product_id != "" and Product.query.get(product_id) is None:
-                Product(id=product_id).create()
-    promotion = Promotion()
-    promotion.deserialize(json)
-    promotion.create()
-    message = promotion.serialize()
-    location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
+@api.route('/promotions', strict_slashes=False)
+class PromotionCollection(Resource):
+    """ Handles all interactions with collections of Promotions """
 
-    app.logger.info("Promotion with ID [%s] created.", promotion.id)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    )
+    # ------------------------------------------------------------------
+    # ADD A NEW PROMOTION
+    # ------------------------------------------------------------------
+    @api.doc('create_promotions')
+    @api.expect(create_model)
+    @api.response(400, 'The posted data was not valid')
+    @api.response(201, 'Promotion created successfully')
+    @api.marshal_with(promotion_model, code=201)
+    def post(self):
+        """
+        Creates a Promotion
+        This endpoint will create a Promotion based the data in the body that is posted
+        """
+        app.logger.info("Request to create a promotion")
+        check_content_type("application/json")
+        json = request.get_json()
+        if "products" in json:
+            for product_id in json["products"]:
+                if product_id != "" and Product.query.get(product_id) is None:
+                    Product(id=product_id).create()
+        promotion = Promotion()
+        promotion.deserialize(json)
+        promotion.create()
+        location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
+        app.logger.info("Promotion with ID [%s] created.", promotion.id)
+        return promotion.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
+
 
 ######################################################################
 # LIST ALL THE PROMOTIONS

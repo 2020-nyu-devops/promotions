@@ -166,7 +166,7 @@ Scenario: Read a promotion
     Then I should not see "Promo2" in the results
 
   Scenario: Cancel a promotion
-    When I visit the "home page"
+    When I visit the "Home Page"
     And I press the "List" button
     Then I should see "Promo1" in the "title" field
     When I copy the "Id" field
