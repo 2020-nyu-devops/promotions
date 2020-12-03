@@ -139,7 +139,10 @@ create_model = api.model('Promotion', {
     'end_date': fields.DateTime(required=False,
                                 description='The end date of the promotion'),
     'is_site_wide': fields.Boolean(required=False,
-                                   description='Is the promotion site wide?')
+                                   description='Is the promotion site wide?'),
+    'products': fields.List(cls_or_instance=fields.Integer, required=False,
+                            description='List of products associated with the promotion.')
+
 })
 
 promotion_model = api.inherit(
