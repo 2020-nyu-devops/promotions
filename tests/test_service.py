@@ -133,7 +133,7 @@ class TestPromotionService(TestCase):
         )
 
     def test_create_promotion_with_product(self):
-        """ Create a new Promotion """
+        """ Create a new Promotion With Product """
         resp = self.app.post(
             "/promotions",
             json={
