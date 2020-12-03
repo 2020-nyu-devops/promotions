@@ -58,6 +58,7 @@ class TestPromotionService(TestCase):
         promotions = []
         for _ in range(count):
             test_promotion = PromotionFactory()
+            logging.debug(test_promotion.serialize())
             resp = self.app.post(
                 "/promotions",
                 json=test_promotion.serialize(),
