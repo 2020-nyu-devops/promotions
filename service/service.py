@@ -186,7 +186,25 @@ class PromotionResource(Resource):
         if not promotion:
             raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
         return promotion.serialize(), status.HTTP_200_OK
-
+    
+    ######################################################################
+    # DELETE A PROMOTION
+    ######################################################################
+    @api.doc('delete_promotions')
+    @api.response(204, 'Promotion deleted')
+    @api.response(200, 'No promotion with that ID to delete')
+    def delete(self, promotion_id):
+        """
+        Delete a Promotion
+        This endpoint will delete a Promotion based the id specified in the path
+        """
+        app.logger.info('Request to Delete a promotion with id [%s]', promotion_id)
+        promo = Promotion.find(promotion_id)
+        if promo:
+            promo.delete()
+            return '', status.HTTP_204_NO_CONTENT
+        else:
+            return '', status.HTTP_200_OK
 
 ######################################################################
 #  PATH: /promotions
@@ -221,7 +239,6 @@ class PromotionCollection(Resource):
         location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
         app.logger.info("Promotion with ID [%s] created.", promotion.id)
         return promotion.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
-
 
 ######################################################################
 # LIST ALL THE PROMOTIONS
@@ -278,25 +295,6 @@ def update_promotions(promotion_id):
     promotion.update()
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
-
-
-######################################################################
-# DELETE A PROMOTION
-######################################################################
-@app.route("/promotions/<int:promotion_id>", methods=["DELETE"])
-def delete_promotions(promotion_id):
-    """
-    Delete a Promotions
-    This endpoint will delete a Promotion based the id specified in the path
-    """
-    app.logger.info("Request to delete promotion with id: %s", promotion_id)
-    promotion = Promotion.find(promotion_id)
-    if not promotion:
-        return make_response("", status.HTTP_200_OK)
-    promotion.delete()
-    app.logger.info("Promotion with ID [%s] delete complete.", promotion_id)
-    return make_response("", status.HTTP_204_NO_CONTENT)
-
 
 ######################################################################
 # CANCEL A PROMOTION

@@ -241,6 +241,7 @@ class TestPromotionService(TestCase):
 
     # If you call the DELETE function on a promotion that doesn't exist, should return OK
     def test_delete_promotion_not_exist(self):
+        """ Delete a Promotion that does not exist """
         resp = self.app.delete(
             "/promotions/{}".format("9999999999999999"), content_type="application/json"
         )
