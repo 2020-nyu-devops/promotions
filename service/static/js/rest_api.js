@@ -160,6 +160,14 @@ $(function () {
         })
 
         ajax.done(function(res){
+            if (res.length > 0) {
+                var firstPromotion = res[0];
+                // copy the first result to the form
+                if (firstPromotion != "") {
+                    update_form_data(firstPromotion);
+                }
+            }
+            
             //alert(res.toSource())
             $("#search_results").empty();
             var table = '<table class="table-striped table-bordered">';
@@ -176,25 +184,16 @@ $(function () {
             table += '<th>Site-wide Status</th>';
             table += '</tr>';
 
-            var firstPromotion = "";
             for(var i = 0; i < res.length; i++) {
                 var promotion = res[i];
                 var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.title+"</td><td>"+promotion.description+"</td><td>"+promotion.promo_code+"</td><td>"+promotion.promo_type+"</td><td>"+promotion.amount+"</td><td>"+promotion.start_date+"</td><td>"+promotion.end_date+"</td><td>"+promotion.products+"</td><td>"+promotion.is_site_wide+"</td></tr>";
                 table += row;
-                if (i == 0) {
-                    firstPromotion = promotion;
-                }
             }
 
             table += '</table>';
             $("#search_results").append(table);
 
-            // copy the first result to the form
-            if (firstPromotion != "") {
-                update_form_data(firstPromotion)
-            }
-
-            flash_message("All promotions listed at the table below")
+            flash_message("All promotions listed at the table below");
         });
 
         ajax.fail(function(res){
