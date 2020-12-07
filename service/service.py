@@ -204,6 +204,36 @@ class PromotionResource(Resource):
         return promotion.serialize(), status.HTTP_200_OK
     
     ######################################################################
+    # UPDATE AN EXISTING PROMOTION
+    ######################################################################
+    @api.doc('update_promotions')
+    @api.response(404, 'Promotion not found')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(promotion_model)
+    @api.marshal_with(promotion_model)
+    def put(self, promotion_id):
+        """
+        Update a Promotion
+        This endpoint will update a Promotion based the body that is posted
+        """
+        app.logger.info("Request to update promotion with id: %s", promotion_id)
+        check_content_type("application/json")
+        json = request.get_json()
+        promotion = Promotion.find(promotion_id)
+        if not promotion:
+            api.abort(status.HTTP_404_NOT_FOUND, "Promotion with id '{}' was not found.".format(promotion_id))
+        json = request.get_json()
+        if "products" in json:
+            for product_id in json["products"]:
+                if product_id != "" and Product.query.get(product_id) is None:
+                    Product(id=product_id).create()
+        promotion.deserialize(json)
+        promotion.id = promotion_id
+        promotion.update()
+        app.logger.info("Promotion with ID [%s] updated.", promotion.id)
+        return promotion.serialize(), status.HTTP_200_OK
+    
+    ######################################################################
     # DELETE A PROMOTION
     ######################################################################
     @api.doc('delete_promotions')
@@ -294,31 +324,6 @@ class PromotionCollection(Resource):
         location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
         app.logger.info("Promotion with ID [%s] created.", promotion.id)
         return promotion.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
-
-######################################################################
-# UPDATE AN EXISTING PROMOTION
-######################################################################
-@app.route("/promotions/<int:promotion_id>", methods=["PUT"])
-def update_promotions(promotion_id):
-    """
-    Update a Promotion
-    This endpoint will update a Promotion based the body that is posted
-    """
-    app.logger.info("Request to update promotion with id: %s", promotion_id)
-    check_content_type("application/json")
-    promotion = Promotion.find(promotion_id)
-    if not promotion:
-        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
-    json = request.get_json()
-    if "products" in json:
-        for product_id in json["products"]:
-            if product_id != "" and Product.query.get(product_id) is None:
-                Product(id=product_id).create()
-    promotion.deserialize(json)
-    promotion.id = promotion_id
-    promotion.update()
-    app.logger.info("Promotion with ID [%s] updated.", promotion.id)
-    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # CANCEL A PROMOTION
