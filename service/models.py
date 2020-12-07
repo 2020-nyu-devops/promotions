@@ -166,7 +166,7 @@ class Promotion(db.Model):
             )
         if "end_date" in args and args["end_date"] is not None:
             data = data.filter(cls.end_date == dateutil.parser.parse(args["end_date"]))
-        if "duration" in args and args["duration"] is not None:
+        if "duration" in args:
             # returns promotions that last the number of days specified
             data = data.filter(
                 cls.start_date + timedelta(days=int(args.get("duration")))
@@ -181,7 +181,7 @@ class Promotion(db.Model):
                 data = data.filter(
                     (cls.start_date > datetime.now()) | (datetime.now() > cls.end_date)
                 )
-        if "product" in args and args["product"] is not None:
+        if "product" in args:
             data = data.filter(cls.products.any(id=int(args.get("product"))))
         return data.all()
 
