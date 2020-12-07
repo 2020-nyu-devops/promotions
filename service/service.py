@@ -206,7 +206,7 @@ class PromotionResource(Resource):
     ######################################################################
     # UPDATE AN EXISTING PROMOTION
     ######################################################################
-    @api.doc('update_promotions', security='apikey')
+    @api.doc('update_promotions')
     @api.response(404, 'Promotion not found')
     @api.response(400, 'The posted data was not valid')
     @api.expect(promotion_model)
