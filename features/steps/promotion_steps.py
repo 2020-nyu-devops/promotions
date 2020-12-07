@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait, Select
 
-WAIT_SECONDS = int(getenv('WAIT_SECONDS', '300'))
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '10'))
 ID_PREFIX = 'promotion_'
 
 
