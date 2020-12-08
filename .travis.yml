@@ -1,19 +1,45 @@
+sudo: required
+
 language: python
 python:
   - "3.6"
+
+services:
+  - postgresql 
+
+env:
+  - DATABASE_URI=postgres://postgres:postgres@localhost:5432/travis_ci_test
 
 # Install Dependencies
 install: "pip install -r requirements.txt"
 
 # Run Tests
-before_script: 
-  - psql -c 'create database travis_ci_test;' -U postgres
+jobs:
+  include:
+    - stage: Test
+      name: TDD
+      before_script: 
+        - psql -c 'create database travis_ci_test;' -U postgres
+      script:
+        - nosetests
 
-script:
-  - nosetests
+    - stage: Test
+      name: BDD
+      addons:
+        chrome: stable
+        apt:
+          packages:
+            - chromium-chromedriver 
+            - python3-selenium
+      before_script:
+        - psql -c 'create database travis_ci_test;' -U postgres
+        - chromedriver --version
+        - gunicorn --log-level=critical --bind=127.0.0.1:5000 service:app &  # start a Web server in the background
+        - sleep 5 # give Web server some time to bind to sockets, etc
+        - curl -I http://localhost:5000/  # make sure the service is up
+      script:
+        - behave
 
 after_success:
   - codecov
-
-services:
-  postgresql
+  - pylint service
