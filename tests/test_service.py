@@ -395,19 +395,6 @@ class TestPromotionService(TestCase):
         # if it gets 200 status, we pass
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    def test_invalid_content_type(self):
-        resp = self.app.post(
-            "/promotions", json="This is a string", content_type="text/html"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-    def test_bad_request(self):
-        """ Test Bad Request """
-        resp = self.app.post(
-            "/promotions", json="{'test': 'promotion'}", content_type="application/json"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_apply_best_promotions(self):
         """ Test Apply Best Promotion """
         # API: /promotions/apply?product_id=product_price
@@ -543,6 +530,30 @@ class TestPromotionService(TestCase):
             data = resp.get_json()
             self.assertEqual(data, result)
 
+    #---------------------------------------------------------------
+    # > Test Cases for Error Handlers                              <
+    #---------------------------------------------------------------
+
+    def test_invalid_content_type(self):
+        """ Test Invalid Content Type """
+        resp = self.app.post(
+            "/promotions", json="This is a string", content_type="text/html"
+        )
+        print(resp.__dir__())
+        print(resp.get_json())
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_bad_request(self):
+        """ Test Bad Request """
+        resp = self.app.post(
+            "/promotions", json="{'test': 'promotion'}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_method_not_allowed(self):
+        """ Test Method Not Allowed """
+        resp = self.app.put("/promotions")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 ######################################################################
 #   M A I N
