@@ -530,9 +530,9 @@ class TestPromotionService(TestCase):
             data = resp.get_json()
             self.assertEqual(data, result)
 
-    #---------------------------------------------------------------
+    # ---------------------------------------------------------------
     # > Test Cases for Error Handlers                              <
-    #---------------------------------------------------------------
+    # ---------------------------------------------------------------
 
     def test_invalid_content_type(self):
         """ Test Invalid Content Type """
@@ -554,6 +554,7 @@ class TestPromotionService(TestCase):
         """ Test Method Not Allowed """
         resp = self.app.put("/promotions")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 ######################################################################
 #   M A I N

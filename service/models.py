@@ -49,10 +49,13 @@ class PromoType(Enum):
 
 
 # pylint: disable=line-too-long
-promotion_products = db.Table('promotion_products',
-                              db.Column('promotion_id', db.Integer, db.ForeignKey('promotion.id'), primary_key=True),
-                              db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True)
-                              )
+promotion_products = db.Table(
+    'promotion_products',
+    db.Column(
+        'promotion_id', db.Integer, db.ForeignKey('promotion.id'), primary_key=True
+    ),
+    db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True),
+)
 
 
 class Product(db.Model):
@@ -112,7 +115,7 @@ class Promotion(db.Model):
         Creates a Promotion in the database
         """
         logger.info("Creating %s", self.title)
-        self.id = None  # id must be none to generate next primary key
+        self.id = None  # id must be none to generate next primary key. pylint: disable=C0103
         db.session.add(self)
         db.session.commit()
 
