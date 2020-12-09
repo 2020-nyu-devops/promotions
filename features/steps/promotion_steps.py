@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait, Select
 
-WAIT_SECONDS = int(getenv('WAIT_SECONDS', '10'))
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '120'))
 ID_PREFIX = 'promotion_'
 
 
@@ -22,7 +22,7 @@ def step_impl(context):
     # Deleting the existing promotions
     context.resp = requests.get(context.base_url + "/promotions", headers=headers)
     expect(context.resp.status_code).to_equal(200)
-    for promo in context.resp.json():
+    for promo in context.resp.json():    
         context.resp = requests.delete(
             context.base_url + "/promotions/" + str(promo["id"]), headers=headers
         )
@@ -45,6 +45,7 @@ def step_impl(context):
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
+    logging.info(f'Wait Seconds: {WAIT_SECONDS}')
 
 
 @when(u'I visit the "home page"')
@@ -188,7 +189,6 @@ def step_impl(context, element_name):
 def step_impl(context, element_name):
     """ Mimic Clipboard - copy """
     element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -200,7 +200,6 @@ def step_impl(context, element_name):
 def step_impl(context, element_name):
     """ Mimic Clipboard - paste """
     element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
