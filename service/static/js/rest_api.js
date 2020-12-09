@@ -141,7 +141,8 @@ $(function () {
         ajax.fail(function(res){
             clear_form_data()
             // flash_message(res.responseJSON.message)
-            flash_message(res.status + ' ' + res.statusText.toUpperCase())
+            // flash_message(res.status + ' ' + res.statusText.toLowerCase())
+            flash_message(res.status)
         });
 
     });

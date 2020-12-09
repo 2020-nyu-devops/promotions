@@ -206,7 +206,7 @@ class Promotion(db.Model):
             elif p.promo_type == PromoType.BOGO and best_discount < 50:
                 best_promo, best_discount = p, 50
             elif p.promo_type == PromoType.FIXED:
-                fixed_discount = ((pricing - p.amount) / pricing) * 100
+                fixed_discount = (p.amount / pricing) * 100
                 if fixed_discount > best_discount:
                     best_promo, best_discount = p, fixed_discount
 
