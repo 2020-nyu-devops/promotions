@@ -92,20 +92,19 @@ def request_validation_error(error):
     }, status.HTTP_400_BAD_REQUEST
 
 
-# query string arguments NOTE: Whoever is doing the query ticket should probably uncomment these and
-# try to make it work with the list function in the promotion collection
+# query string arguments
 # --------------------------------------------------------------------------------------------------
-# promotion_args = reqparse.RequestParser()
-# promotion_args.add_argument('title', type=str, required=False, help='List Promotions by title')
-# promotion_args.add_argument('promo_code', type=str, required=False, help='List Promotions by promo code')
-# promotion_args.add_argument('promo_type', type=str, required=False, help='List Promotions by promo type')
-# promotion_args.add_argument('amount', type=int, required=False, help='List Promotions by the amount discounted')
-# promotion_args.add_argument('start_date', type=str, required=False, help='List Promotions by start date')
-# promotion_args.add_argument('end_date', type=str, required=False, help='List Promotions by end date')
-# promotion_args.add_argument('duration', type=int, required=False, help='List Promotions by duration')
-# promotion_args.add_argument('active', type=str, required=False, help='List Promotions by active status')
-# promotion_args.add_argument('is_site_wide', type=str, required=False, help='List Promotions by site wide status')
-# promotion_args.add_argument('product', type=int, required=False, help='List Promotions by a product')
+promotion_args = reqparse.RequestParser()
+promotion_args.add_argument('title', type=str, required=False, location='args', help='List Promotions by title')
+promotion_args.add_argument('promo_code', type=str, required=False, location='args', help='List Promotions by promo code')
+promotion_args.add_argument('promo_type', type=str, required=False, location='args', help='List Promotions by promo type')
+promotion_args.add_argument('amount', type=int, required=False, location='args', help='List Promotions by the amount discounted')
+promotion_args.add_argument('start_date', type=str, required=False, location='args', help='List Promotions by start date')
+promotion_args.add_argument('end_date', type=str, required=False, location='args', help='List Promotions by end date')
+promotion_args.add_argument('duration', type=int, required=False, location='args', help='List Promotions by duration')
+promotion_args.add_argument('active', type=str, required=False, location='args', help='List Promotions by active status')
+promotion_args.add_argument('is_site_wide', type=str, required=False, location='args', help='List Promotions by site wide status')
+promotion_args.add_argument('product', type=int, required=False, location='args', help='List Promotions by a product')
 
 
 ######################################################################
@@ -200,20 +199,12 @@ class PromotionCollection(Resource):
     # LIST ALL PROMOTIONS
     # ------------------------------------------------------------------
     @api.doc('list_promotions')
-    # @api.expect(promotion_args, validate=True)
+    @api.expect(promotion_args, validate=True)
     @api.marshal_list_with(promotion_model)
     def get(self):
         """ Returns all of the Promotions """
-        # This is the way we could implement the function if we were following the professors example
-        # whoever is doing the query ticket should probably try to do it this way.
-        # ------------------------------------------------------------------------------------------
-        # args = promotion_args.parse_args()
-        # app.logger.info(args)
-        # promotions = Promotion.find_by_query_string(args)
-        # results = [promotion.serialize() for promotion in promotions]
-        # app.logger.info("Returning %d promotions", len(results))
-        # return results, status.HTTP_200_OK
-        app.logger.info("Request to list all promotions")
+        args = promotion_args.parse_args()
+        app.logger.info("Request to list promotions based on query string %s ...", args)
         filters = [
             "title",
             "is_site_wide",
@@ -226,11 +217,7 @@ class PromotionCollection(Resource):
             "active",
             "product",
         ]
-        app.logger.info(request.args)
-        if any(i in request.args for i in filters):
-            promotions = Promotion.find_by_query_string(request.args)
-        else:
-            promotions = Promotion.all()
+        promotions = Promotion.find_by_query_string(args)
         results = [promo.serialize() for promo in promotions]
         app.logger.info("Returning %d promotions", len(results))
         return results, status.HTTP_200_OK
