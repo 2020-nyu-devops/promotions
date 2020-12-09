@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait, Select
 
-WAIT_SECONDS = int(getenv('WAIT_SECONDS', '10'))
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '120'))
 ID_PREFIX = 'promotion_'
 
 
@@ -20,7 +20,7 @@ def step_impl(context):
     # Deleting the existing promotions
     context.resp = requests.get(context.base_url + "/promotions", headers=headers)
     expect(context.resp.status_code).to_equal(200)
-    for promo in context.resp.json():
+    for promo in context.resp.json():    
         context.resp = requests.delete(
             context.base_url + "/promotions/" + str(promo["id"]), headers=headers
         )
