@@ -18,7 +18,7 @@ Background:
 Scenario: The server is running
     When I visit the "home page"
     Then I should see "Promotion RESTful Service"
-    And I should not see "404 Not Found"
+    And I should not see "404"
 
   Scenario: List all active site-wide BOGO promotions
     When I visit the "home page"
@@ -57,7 +57,7 @@ Scenario: The server is running
     And I press the "Clear" button
     And I paste the "Id" field
     And I press the "Retrieve" button
-    Then I should see the message "404 NOT FOUND"
+    Then I should see the message "404"
     When I press the "Clear" button
     And I press the "List" button
     Then I should not see "Promo5" in the results
