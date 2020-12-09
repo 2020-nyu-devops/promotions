@@ -250,22 +250,27 @@ class PromotionCollection(Resource):
         return promotion.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
 
 ######################################################################
-# CANCEL A PROMOTION
+#  CANCEL A PROMOTION - /promotions/{id}/cancel
 ######################################################################
-@app.route("/promotions/<int:promotion_id>/cancel", methods=["POST"])
-def cancel_promotions(promotion_id):
-    """
-    Cancel a Promotions
-    This endpoint will cancel a Promotion based an ID
-    """
-    app.logger.info("Request to cancel promotion with id: %s", promotion_id)
-    promotion = Promotion.find(promotion_id)
-    if not promotion:
-        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
-    promotion.end_date = datetime.now()
-    promotion.update()
-    app.logger.info("Promotion with ID [%s] cancelled", promotion_id)
-    return make_response("", status.HTTP_200_OK)
+@api.route("/promotions/<int:promotion_id>/cancel")
+@api.param('promotion_id', 'The Promotion identifier')
+class PromotionCancellation(Resource):
+    @api.doc('cancel_promotions')
+    @api.response(404, 'Promotion not found')
+    @api.response(200, 'Promotion cancelled')
+    def post(self, promotion_id):
+        """
+        Cancels a single Promotion
+        This endpoint will cancel a Promotion based on it's id
+        """
+        app.logger.info("Request to cancel Promotion with id: %s", promotion_id)
+        promotion = Promotion.find(promotion_id)
+        if not promotion:
+            raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+        promotion.end_date = datetime.now()
+        promotion.update()
+        app.logger.info("Promotion with ID [%s] cancelled", promotion_id)
+        return make_response("", status.HTTP_200_OK)
 
 @api.route('/promotions/apply', strict_slashes=False)
 class PromotionCollection(Resource):

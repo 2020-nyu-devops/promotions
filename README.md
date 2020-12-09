@@ -86,8 +86,17 @@ You can also manually run `nosetests` with `coverage` (but `setup.cfg` does this
     $ nosetests --with-coverage --cover-package=service
 ```
 
-Try and get as close to 100% coverage as you can.
+Try and get as close to 100% coverage as you can. For the BDD tests, from within the VM run:
 
+```shell
+    $ honcho start
+```
+
+Then open up another terminal window, ssh in to the VM, and while the server is still running in the other window, run:
+
+```shell
+    $ behave
+```
 
 ## Deploy to IBM Cloud manually
 The `manifest.yml` file must be edited with the configuration of the cloud where is application is to be deployed to.
