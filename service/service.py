@@ -6,9 +6,7 @@ Paths:
 GET / - Returns the UI and 200 code, for Selenium testing
 POST /promotions - creates a new Promotion record in the database
 """
-import os
-import sys
-import logging
+# pylint: disable=R0201
 from datetime import datetime
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
