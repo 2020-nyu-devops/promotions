@@ -6,9 +6,7 @@ Paths:
 GET / - Returns the UI and 200 code, for Selenium testing
 POST /promotions - creates a new Promotion record in the database
 """
-import os
-import sys
-import logging
+# pylint: disable=R0201
 from datetime import datetime
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status  # HTTP Status Codes
@@ -36,46 +34,61 @@ def index():
 ######################################################################
 # Configure Swagger before initializing it
 ######################################################################
-api = Api(app,
-          version='1.0.0',
-          title='Promotions REST API Service',
-          description='This is the Promotions server.',
-          default='promotions',
-          default_label='Promotions service operations',
-          doc='/api-docs',
-          prefix='/'
-          )
+api = Api(
+    app,
+    version='1.0.0',
+    title='Promotions REST API Service',
+    description='This is the Promotions server.',
+    default='promotions',
+    default_label='Promotions service operations',
+    doc='/api-docs',
+    prefix='/',
+)
 
 # Define the model so that the docs reflect what can be sent
-create_model = api.model('Promotion', {
-    'title': fields.String(required=False,
-                           description='The name of the promotion'),
-    'description': fields.String(required=False,
-                                 description='The description of the promotion'),
-    'promo_code': fields.String(required=False,
-                                description='The promo code associated with this promotion'),
-    'promo_type': fields.String(required=False,
-                                description='The type of promotion [BOGO | DISCOUNT | FIXED]'),
-    'amount': fields.Integer(required=False,
-                             description='The amount of the promotion based on promo type'),
-    'start_date': fields.DateTime(required=False,
-                                  description='The start date of the promotion'),
-    'end_date': fields.DateTime(required=False,
-                                description='The end date of the promotion'),
-    'is_site_wide': fields.Boolean(required=False,
-                                   description='Is the promotion site wide?'),
-    'products': fields.List(cls_or_instance=fields.Integer, required=False,
-                            description='List of products associated with the promotion.')
-
-})
+create_model = api.model(
+    'Promotion',
+    {
+        'title': fields.String(required=False, description='The name of the promotion'),
+        'description': fields.String(
+            required=False, description='The description of the promotion'
+        ),
+        'promo_code': fields.String(
+            required=False, description='The promo code associated with this promotion'
+        ),
+        'promo_type': fields.String(
+            required=False,
+            description='The type of promotion [BOGO | DISCOUNT | FIXED]',
+        ),
+        'amount': fields.Integer(
+            required=False,
+            description='The amount of the promotion based on promo type',
+        ),
+        'start_date': fields.DateTime(
+            required=False, description='The start date of the promotion'
+        ),
+        'end_date': fields.DateTime(
+            required=False, description='The end date of the promotion'
+        ),
+        'is_site_wide': fields.Boolean(
+            required=False, description='Is the promotion site wide?'
+        ),
+        'products': fields.List(
+            cls_or_instance=fields.Integer,
+            required=False,
+            description='List of products associated with the promotion.',
+        ),
+    },
+)
 
 promotion_model = api.inherit(
     'PromotionModel',
     create_model,
     {
-        'id': fields.Integer(readOnly=True,
-                             description='The unique id assigned internally by service'),
-    }
+        'id': fields.Integer(
+            readOnly=True, description='The unique id assigned internally by service'
+        ),
+    },
 )
 
 ######################################################################
@@ -88,7 +101,7 @@ def request_validation_error(error):
     return {
         'status_code': status.HTTP_400_BAD_REQUEST,
         'error': 'Bad Request',
-        'message': str(error)
+        'message': str(error),
     }, status.HTTP_400_BAD_REQUEST
 
 
@@ -136,9 +149,12 @@ class PromotionResource(Resource):
         app.logger.info("Request for promotion with id: %s", promotion_id)
         promotion = Promotion.find(promotion_id)
         if not promotion:
-            api.abort(status.HTTP_404_NOT_FOUND, f"Promotion with id '{promotion_id}' was not found.")
+            api.abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Promotion with id '{promotion_id}' was not found.",
+            )
         return promotion.serialize(), status.HTTP_200_OK
-    
+
     ######################################################################
     # UPDATE AN EXISTING PROMOTION
     ######################################################################
@@ -157,7 +173,10 @@ class PromotionResource(Resource):
         json = request.get_json()
         promotion = Promotion.find(promotion_id)
         if not promotion:
-            api.abort(status.HTTP_404_NOT_FOUND, "Promotion with id '{}' was not found.".format(promotion_id))
+            api.abort(
+                status.HTTP_404_NOT_FOUND,
+                "Promotion with id '{}' was not found.".format(promotion_id),
+            )
         json = request.get_json()
         if "products" in json:
             for product_id in json["products"]:
@@ -168,7 +187,7 @@ class PromotionResource(Resource):
         promotion.update()
         app.logger.info("Promotion with ID [%s] updated.", promotion.id)
         return promotion.serialize(), status.HTTP_200_OK
-    
+
     ######################################################################
     # DELETE A PROMOTION
     ######################################################################
@@ -180,6 +199,7 @@ class PromotionResource(Resource):
         Delete a Promotion
         This endpoint will delete a Promotion based the id specified in the path
         """
+        # pylint: disable=R1705
         app.logger.info('Request to Delete a promotion with id [%s]', promotion_id)
         promo = Promotion.find(promotion_id)
         if promo:
@@ -187,6 +207,7 @@ class PromotionResource(Resource):
             return '', status.HTTP_204_NO_CONTENT
         else:
             return '', status.HTTP_200_OK
+
 
 ######################################################################
 #  PATH: /promotions
@@ -245,9 +266,16 @@ class PromotionCollection(Resource):
         promotion = Promotion()
         promotion.deserialize(json)
         promotion.create()
-        location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
+        location_url = api.url_for(
+            PromotionResource, promotion_id=promotion.id, _external=True
+        )
         app.logger.info("Promotion with ID [%s] created.", promotion.id)
-        return promotion.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
+        return (
+            promotion.serialize(),
+            status.HTTP_201_CREATED,
+            {"Location": location_url},
+        )
+
 
 ######################################################################
 #  CANCEL A PROMOTION - /promotions/{id}/cancel
@@ -272,6 +300,7 @@ class PromotionCancellation(Resource):
         app.logger.info("Promotion with ID [%s] cancelled", promotion_id)
         return make_response("", status.HTTP_200_OK)
 
+
 @api.route('/promotions/apply', strict_slashes=False)
 class PromotionCollection(Resource):
 
@@ -288,7 +317,6 @@ class PromotionCollection(Resource):
         if len(request.args) > 0:
             results = [
                 Promotion.apply_best_promo(product, int(request.args.get(product)))
-                
                 for product in request.args
             ]
             results = list(filter(None, results))
@@ -296,6 +324,7 @@ class PromotionCollection(Resource):
             results = []
         app.logger.info("Returning %d results.", len(results))
         return results, status.HTTP_200_OK
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

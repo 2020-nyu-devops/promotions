@@ -1,7 +1,7 @@
 # Promotions
 
 [![Build Status](https://travis-ci.org/2020-nyu-devops/promotions.svg?branch=master)](https://travis-ci.org/2020-nyu-devops/promotions)
-[![codecov](https://codecov.io/gh/2020-nyu-devops/promotions/branch/master/graph/badge.svg?token=N3CA84MPTL)](undefined)
+[![codecov](https://codecov.io/gh/2020-nyu-devops/promotions/branch/master/graph/badge.svg?token=N3CA84MPTL)](https://codecov.io/gh/2020-nyu-devops/promotions/)
 
 This repository is part of the NYU class **CSCI-GA.2810-001: DevOps and Agile Methodologies** taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science. It contains the work done by the promotions squad for this class in fall of 2020.
 
@@ -125,27 +125,27 @@ Once the application is deployed and started, open a web browser and point to th
 
 ## Endpoints
 
-| Request Type | Endpoint | Description |
-|-------| ------ |------------|
-|```GET``` |```/promotions``` | List all promotions or query based on certain parameters. |
-|```GET``` |```/promotions/<id>``` | Get a specific promotion based on its ID|
-|```POST``` |```/promotions``` | Creates a promotion with information in request body |
-|```PUT``` |```/promotions/<id>``` | Updates a promotion with information in request body |
-|```DELETE``` |```/promotions/<id>``` | Deletes a promotion based on its ID |
-|```POST``` |```/promotions/cancel/<id>``` | Cancels a promotion based on its ID |
-|```GET``` |```/promotions/apply``` | Applies best promotion available to the list of products. Returns which promo-code to be applied. |
+| Request Type | Endpoint                      | Description                                                                                       |
+| ------------ | ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| ```GET```    | ```/promotions```             | List all promotions or query based on certain parameters.                                         |
+| ```GET```    | ```/promotions/<id>```        | Get a specific promotion based on its ID                                                          |
+| ```POST```   | ```/promotions```             | Creates a promotion with information in request body                                              |
+| ```PUT```    | ```/promotions/<id>```        | Updates a promotion with information in request body                                              |
+| ```DELETE``` | ```/promotions/<id>```        | Deletes a promotion based on its ID                                                               |
+| ```POST```   | ```/promotions/cancel/<id>``` | Cancels a promotion based on its ID                                                               |
+| ```GET```    | ```/promotions/apply```       | Applies best promotion available to the list of products. Returns which promo-code to be applied. |
 
 #### Query Parameters
 
-| Parameter |Description |
-|--------|-------------|
-|```amount``` | Filter the results based on the amount of discount |
-|```is_site_wide``` | Filter the results based on whether the promotion is available for the entire store |
-|```promo_code``` | Filter the results for a particular Promo Code |
-|```promo_type``` | Filter the results for a particular Promo Type |
-|```start_date``` | Filter the results based on a start date. |
-|```end_date``` | Filter the results based on an end date. |
-|``` duration``` | Filter the results based on the duration (in days) of a promotion. For example, filter out all the ads with duration greater than 10 days. |
+| Parameter          | Description                                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| ```amount```       | Filter the results based on the amount of discount                                                                                         |
+| ```is_site_wide``` | Filter the results based on whether the promotion is available for the entire store                                                        |
+| ```promo_code```   | Filter the results for a particular Promo Code                                                                                             |
+| ```promo_type```   | Filter the results for a particular Promo Type                                                                                             |
+| ```start_date```   | Filter the results based on a start date.                                                                                                  |
+| ```end_date```     | Filter the results based on an end date.                                                                                                   |
+| ``` duration```    | Filter the results based on the duration (in days) of a promotion. For example, filter out all the ads with duration greater than 10 days. |
 
 ##### Date Format
 
