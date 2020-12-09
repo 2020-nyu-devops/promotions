@@ -183,7 +183,7 @@ class Promotion(db.Model):
                 )
         if "product" in args and args["product"] is not None:
             data = data.filter(cls.products.any(id=int(args.get("product"))))
-        return data.all()
+        return data.order_by(Promotion.title).all()
 
     @classmethod
     def apply_best_promo(cls, product_id, pricing):
@@ -266,7 +266,7 @@ class Promotion(db.Model):
     def all(cls):
         """ Returns all of the Promotions in the database """
         logger.info("Processing all Promotions")
-        return cls.query.all()
+        return cls.query.order_by(Promotion.title).all()
 
     @classmethod
     def init_db(cls, app):
